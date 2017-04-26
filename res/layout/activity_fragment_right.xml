@@ -1,0 +1,23 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/LinearLayout1"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    tools:context="com.fpl.myapp.activity.manage.FragmentRight" >
+
+    <Button
+        android:id="@+id/btn_getInfo"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:background="@drawable/circle_corner_button_selector"
+        android:text="更新" />
+
+    <ListView
+        android:id="@+id/lv_project"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:listSelector="@android:color/holo_blue_light" >
+    </ListView>
+
+</LinearLayout>
