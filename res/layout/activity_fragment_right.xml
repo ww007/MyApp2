@@ -10,8 +10,10 @@
         android:id="@+id/btn_getInfo"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
         android:background="@drawable/circle_corner_button_selector"
-        android:text="更新" />
+        android:text="更新"
+        android:textColor="#ffffff" />
 
     <ListView
         android:id="@+id/lv_project"

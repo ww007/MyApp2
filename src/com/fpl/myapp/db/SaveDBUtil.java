@@ -152,7 +152,6 @@ public class SaveDBUtil {
 			StudentItem studentItem = new StudentItem(null, studentCode, itemCode, null, 0, null, 0, null, null, null);
 			DbService.getInstance(context).saveStudentItem(studentItem);
 		}
-		long time2 = System.currentTimeMillis();
 		Notification.Builder builder = new Notification.Builder(context);
 		builder.setSmallIcon(R.drawable.app);
 		builder.setLargeIcon(BitmapFactory.decodeResource(context.getResources(), R.drawable.app));
@@ -169,7 +168,7 @@ public class SaveDBUtil {
 		PendingIntent hangPendingIntent = PendingIntent.getActivity(context, 0, hangIntent,
 				PendingIntent.FLAG_CANCEL_CURRENT);
 		builder.setFullScreenIntent(hangPendingIntent, true);
-		notificationManager = (NotificationManager) context.getSystemService(context.NOTIFICATION_SERVICE);
+		notificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
 		notificationManager.notify(2, builder.build());
 	}
 

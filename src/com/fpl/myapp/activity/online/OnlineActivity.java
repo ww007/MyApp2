@@ -227,6 +227,8 @@ public class OnlineActivity extends Activity {
 		final View textEntryView = factory.inflate(R.layout.dialog, null);
 		final EditText editIP = (EditText) textEntryView.findViewById(R.id.et_IP);
 		final EditText editNumber = (EditText) textEntryView.findViewById(R.id.et_number);
+		editIP.setText(ip);
+		editNumber.setText(number);
 		AlertDialog.Builder ad1 = new AlertDialog.Builder(OnlineActivity.this);
 		ad1.setTitle("输入上传地址:");
 		ad1.setIcon(android.R.drawable.ic_dialog_info);

@@ -197,7 +197,7 @@
 
                 <category android:name="android.intent.category.HOME" />
             </intent-filter>
-        </receiver>
+        </receiver>
         -->
         <activity
             android:name="com.fpl.myapp.activity.manage.ProjectManagerActivity"
@@ -208,6 +208,10 @@
             android:label="@string/app_name" >
         </activity>
         <activity android:name="com.fpl.myapp.activity.CaptureActivity" >
+        </activity>
+        <activity
+            android:name="com.fpl.myapp.activity.manage.SharedpreferencesActivity"
+            android:label="@string/title_activity_sharedpreferences" >
         </activity>
     </application>
 

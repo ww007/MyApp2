@@ -39,5 +39,6 @@
     <string name="title_activity_fragment_left">FragmentLeftActivity</string>
     <string name="title_activity_fragment_right">FragmentRightActivity</string>
     <string name="title_activity_shuttle_run">ShuttleRunActivity</string>
+    <string name="title_activity_sharedpreferences">SharedpreferencesActivity</string>
 
 </resources>

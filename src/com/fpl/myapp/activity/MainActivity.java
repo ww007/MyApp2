@@ -33,7 +33,7 @@ public class MainActivity extends NFCActivity {
 	private int[] icon = { R.drawable.main_projects_selector, R.drawable.main_online_selector,
 			R.drawable.main_iccard_selector, R.drawable.main_manager_selector, R.drawable.main_help_selector,
 			R.drawable.main_quit_selector };
-	private String[] iconname = { "项目选择", "计算机联机", "测试卡信息", "系统管理", "帮助", "关机" };
+	private String[] iconname = { "项目选择", "计算机联机", "测试卡信息", "系统管理", "帮助", "退出" };
 	private GridView gvMain;
 	private ArrayList<Map<String, Object>> dataList;
 	private SimpleAdapter simAdapter;

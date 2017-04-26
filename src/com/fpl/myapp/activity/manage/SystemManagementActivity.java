@@ -15,7 +15,7 @@ import android.widget.ListView;
 public class SystemManagementActivity extends Activity {
 
 	private ListView lv;
-	private String[] data = { "WLAN", "项目设置", "日期和时间", "存储", "关于本机" };
+	private String[] data = { "初始化设置", "WLAN", "项目设置", "日期和时间", "存储", "关于本机" };
 	private ImageButton ibQuit;
 
 	@Override
@@ -51,22 +51,25 @@ public class SystemManagementActivity extends Activity {
 			public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
 				switch (position) {
 				case 0:
+					startActivity(new Intent(SystemManagementActivity.this, SharedpreferencesActivity.class));
+					break;
+				case 1:
 					if (android.os.Build.VERSION.SDK_INT > 10) {
 						startActivity(new Intent(android.provider.Settings.ACTION_WIFI_SETTINGS));
 					} else {
 						startActivity(new Intent(android.provider.Settings.ACTION_WIRELESS_SETTINGS));
 					}
 					break;
-				case 1:
+				case 2:
 					startActivity(new Intent(SystemManagementActivity.this, ProjectManagerActivity.class));
 					break;
-				case 2:
+				case 3:
 					startActivity(new Intent(android.provider.Settings.ACTION_DATE_SETTINGS));
 					break;
-				case 3:
+				case 4:
 					startActivity(new Intent(android.provider.Settings.ACTION_INTERNAL_STORAGE_SETTINGS));
 					break;
-				case 4:
+				case 5:
 					break;
 				default:
 					break;
