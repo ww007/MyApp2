@@ -12,6 +12,7 @@
         android:background="@drawable/quit_selector" />
 
     <TextView
+        android:id="@+id/tv_top_title"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:padding="3dp"

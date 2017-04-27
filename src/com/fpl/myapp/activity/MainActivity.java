@@ -48,10 +48,10 @@ public class MainActivity extends NFCActivity {
 
 	}
 
-	@Override
-	public void onNewIntent(Intent intent) {
-		initICCard(intent);
-	}
+//	@Override
+//	public void onNewIntent(Intent intent) {
+//		initICCard(intent);
+//	}
 
 	/**
 	 * ≥ı ºªØICø®

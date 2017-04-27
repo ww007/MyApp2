@@ -2,7 +2,11 @@ package com.fpl.myapp.activity.information;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import org.apache.log4j.Logger;
+
 import com.fpl.myapp2.R;
+import com.fpl.myapp.activity.project.BroadJumpActivity;
 import com.fpl.myapp.adapter.ICInfoAdapter;
 import com.fpl.myapp.base.NFCActivity;
 import com.fpl.myapp.db.DbService;
@@ -45,6 +49,7 @@ public class ICInformationActivity extends NFCActivity {
 			numberZFP, numberTJZ, numberZQYQ, numberYY;
 	private List<Item> items;
 	private ImageButton ibQuit;
+	private Logger log = Logger.getLogger(ICInformationActivity.class);
 
 	Handler mHandler = new Handler();
 	Runnable updateTv = new Runnable() {
@@ -303,19 +308,26 @@ public class ICInformationActivity extends NFCActivity {
 	 * @param itemService
 	 * @throws Exception
 	 */
-	private void readVision(NFCItemServiceImpl itemService) throws Exception {
+	private void readVision(NFCItemServiceImpl itemService) {
 		// 读取视力
-		IC_ItemResult itemResultVision = itemService.IC_ReadItemResult(Constant.VISION);
-		Log.i("读取视力测试", itemResultVision.toString());
-		if (itemResultVision.getResult()[0].getResultFlag() != 1) {
-			newValue[numberLSL] = "（未测）";
-			newValue[numberRSL] = "（未测）";
-		} else {
-			double left = itemResultVision.getResult()[0].getResultVal();
-			double right = itemResultVision.getResult()[2].getResultVal();
-			newValue[numberLSL] = left + "";
-			newValue[numberRSL] = right + "";
+		IC_ItemResult itemResultVision;
+		try {
+			itemResultVision = itemService.IC_ReadItemResult(Constant.VISION);
+			Log.i("读取视力测试", itemResultVision.toString());
+			if (itemResultVision.getResult()[0].getResultFlag() != 1) {
+				newValue[numberLSL] = "（未测）";
+				newValue[numberRSL] = "（未测）";
+			} else {
+				double left = itemResultVision.getResult()[0].getResultVal();
+				double right = itemResultVision.getResult()[2].getResultVal();
+				newValue[numberLSL] = left + "";
+				newValue[numberRSL] = right + "";
+			}
+		} catch (Exception e) {
+			log.debug("此IC卡中没有视力项目");
+			e.printStackTrace();
 		}
+
 	}
 
 	/**
@@ -324,45 +336,58 @@ public class ICInformationActivity extends NFCActivity {
 	 * @param itemService
 	 * @throws Exception
 	 */
-	private void readMiddleRun(IItemService itemService) throws Exception {
-		IC_ItemResult itemResultMiddleRace = itemService.IC_ReadItemResult(Constant.MIDDLE_RACE);
-		Log.i("读取中长跑测试", itemResultMiddleRace.toString());
-		if (sex.equals("女")) {
-			newValue[number1000] = "（无）";
-			if (itemResultMiddleRace.getResult()[0].getResultFlag() != 1) {
-				newValue[number800] = "（未测）";
+	private void readMiddleRun(IItemService itemService) {
+		IC_ItemResult itemResultMiddleRace;
+		try {
+			itemResultMiddleRace = itemService.IC_ReadItemResult(Constant.MIDDLE_RACE);
+			Log.i("读取中长跑测试", itemResultMiddleRace.toString());
+			if (sex.equals("女")) {
+				newValue[number1000] = "（无）";
+				if (itemResultMiddleRace.getResult()[0].getResultFlag() != 1) {
+					newValue[number800] = "（未测）";
+				} else {
+					newValue[number800] = itemResultMiddleRace.getResult()[0].getResultVal() + " ms";
+				}
 			} else {
-				newValue[number800] = itemResultMiddleRace.getResult()[0].getResultVal() + " ms";
+				newValue[number800] = "（无）";
+				if (itemResultMiddleRace.getResult()[0].getResultFlag() != 1) {
+					newValue[number1000] = "（未测）";
+				} else {
+					newValue[number1000] = itemResultMiddleRace.getResult()[0].getResultVal() + " ms";
+				}
 			}
-		} else {
-			newValue[number800] = "（无）";
-			if (itemResultMiddleRace.getResult()[0].getResultFlag() != 1) {
-				newValue[number1000] = "（未测）";
-			} else {
-				newValue[number1000] = itemResultMiddleRace.getResult()[0].getResultVal() + " ms";
-			}
+		} catch (Exception e) {
+			log.debug("此IC卡中没有中长跑项目");
+			e.printStackTrace();
 		}
+
 	}
 
 	/**
 	 * 从IC卡读取身高体重
 	 * 
 	 * @param itemService
-	 * @throws Exception
 	 */
-	private void readHW(IItemService itemService) throws Exception {
+	private void readHW(IItemService itemService) {
 		// 读取身高体重
-		IC_ItemResult itemResultHW = itemService.IC_ReadItemResult(Constant.HEIGHT_WEIGHT);
-		Log.i("读取身高体重测试", itemResultHW.toString());
-		if (itemResultHW.getResult()[0].getResultFlag() != 1) {
-			newValue[numberH] = "（未测）";
-			newValue[numberW] = "（未测）";
-		} else {
-			double height = itemResultHW.getResult()[0].getResultVal();
-			double weight = itemResultHW.getResult()[2].getResultVal();
-			newValue[numberH] = height / 10 + " cm";
-			newValue[numberW] = weight / 1000 + " kg";
+		IC_ItemResult itemResultHW;
+		try {
+			itemResultHW = itemService.IC_ReadItemResult(Constant.HEIGHT_WEIGHT);
+			Log.i("读取身高体重测试", itemResultHW.toString());
+			if (itemResultHW.getResult()[0].getResultFlag() != 1) {
+				newValue[numberH] = "（未测）";
+				newValue[numberW] = "（未测）";
+			} else {
+				double height = itemResultHW.getResult()[0].getResultVal();
+				double weight = itemResultHW.getResult()[2].getResultVal();
+				newValue[numberH] = height / 10 + " cm";
+				newValue[numberW] = weight / 1000 + " kg";
+			}
+		} catch (Exception e) {
+			log.debug("此IC卡中没有身高体重项目");
+			e.printStackTrace();
 		}
+
 	}
 
 	/**
@@ -375,16 +400,21 @@ public class ICInformationActivity extends NFCActivity {
 	 *            项目机器代码
 	 * @param unit
 	 *            单位
-	 * @throws Exception
 	 */
-	private void readOne(IItemService itemService, int number, int code, String unit) throws Exception {
-		IC_ItemResult itemResult = itemService.IC_ReadItemResult(code);
-		Log.d(code + "一次成绩：", itemResult.toString());
-		if (itemResult.getResult()[0].getResultFlag() != 1) {
-			newValue[number] = "（未测）";
-		} else {
-			newValue[number] = itemResult.getResult()[0].getResultVal() + unit;
+	private void readOne(IItemService itemService, int number, int code, String unit) {
+		IC_ItemResult itemResult;
+		try {
+			itemResult = itemService.IC_ReadItemResult(code);
+			Log.d(code + "一次成绩：", itemResult.toString());
+			if (itemResult.getResult()[0].getResultFlag() != 1) {
+				newValue[number] = "（未测）";
+			} else {
+				newValue[number] = itemResult.getResult()[0].getResultVal() + unit;
+			}
+		} catch (Exception e) {
+			log.debug("此IC卡中没有项目机器代码为" + code + "的项目");
 		}
+
 	}
 
 	private void initView() {
