@@ -23,14 +23,14 @@ import ww.greendao.dao.StudentItemDao;
 public class DbService {
 	private static DbService instance;
 	private static Context appContext;
-	private DaoSession mDaoSession;
-	private ClassesDao classesDao;
-	private GradeDao gradeDao;
-	private ItemDao itemDao;
-	private RoundResultDao roundResultDao;
-	private SchoolDao schoolDao;
-	private StudentDao studentDao;
-	private StudentItemDao studentItemDao;
+	public static DaoSession mDaoSession;
+	public static ClassesDao classesDao;
+	public static GradeDao gradeDao;
+	public static ItemDao itemDao;
+	public static RoundResultDao roundResultDao;
+	public static SchoolDao schoolDao;
+	public static StudentDao studentDao;
+	public static StudentItemDao studentItemDao;
 
 	public static DbService getInstance(Context context) {
 		if (instance == null) {
@@ -86,6 +86,7 @@ public class DbService {
 		List<Student> students = qb.where(StudentDao.Properties.StudentCode.eq(code)).list();
 		return students;
 	}
+
 	public List<School> querySchoolByName(String name) {
 		QueryBuilder<School> qb = schoolDao.queryBuilder();
 		List<School> schools = qb.where(SchoolDao.Properties.SchoolName.eq(name)).list();
@@ -106,7 +107,8 @@ public class DbService {
 
 	public List<StudentItem> queryStudentItemByCode(String stuCode, String itemCode) {
 		QueryBuilder<StudentItem> qb = studentItemDao.queryBuilder();
-		qb.where(qb.and(StudentItemDao.Properties.StudentCode.eq(stuCode), StudentItemDao.Properties.ItemCode.eq(itemCode)));
+		qb.where(qb.and(StudentItemDao.Properties.StudentCode.eq(stuCode),
+				StudentItemDao.Properties.ItemCode.eq(itemCode)));
 		return qb.list();
 	}
 

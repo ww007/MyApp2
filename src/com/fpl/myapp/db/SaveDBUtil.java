@@ -26,7 +26,9 @@ import android.content.Context;
 import android.content.Intent;
 import android.graphics.BitmapFactory;
 import android.util.Log;
+import de.greenrobot.dao.async.AsyncSession;
 import ww.greendao.dao.Classes;
+import ww.greendao.dao.DaoSession;
 import ww.greendao.dao.Grade;
 import ww.greendao.dao.RoundResult;
 import ww.greendao.dao.School;
@@ -40,6 +42,11 @@ public class SaveDBUtil {
 	private static long flag = -1;
 	public static int over = 0;
 	private static NotificationManager notificationManager;
+	private static ArrayList<Student> mStudents;
+	private static AsyncSession mAsyncSession = DbService.mDaoSession.startAsyncSession();
+	private static ArrayList<StudentItem> mStudentItems;
+	private static ArrayList<Classes> mClasses;
+	private static ArrayList<Grade> mGrade;
 
 	/**
 	 * 数据库中查询所有成绩并存入IC卡
@@ -77,6 +84,9 @@ public class SaveDBUtil {
 	 * @return
 	 */
 	public static int saveStudentDB(String response, List<PH_Student> students, Context context) {
+		mStudents = new ArrayList<Student>();
+		mClasses = new ArrayList<Classes>();
+		mGrade = new ArrayList<Grade>();
 		// 解析获取的Json数据
 		JSONObject jsonObject = JSON.parseObject(response);
 		JSONArray jsonSchool = jsonObject.getJSONArray("school");
@@ -97,32 +107,50 @@ public class SaveDBUtil {
 			Long SchoolID = DbService.getInstance(context).querySchoolByName(grades.get(i).getSchoolName().toString())
 					.get(0).getSchoolID();
 			Grade grade = new Grade(null, SchoolID, grades.get(i).getGradeCode(), grades.get(i).getGradeName(), null);
-			DbService.getInstance(context).saveGrade(grade);
+			mGrade.add(grade);
 		}
-		Log.i("----------", "保存年级信息完成");
+		mAsyncSession.runInTx(new Runnable() {
+			@Override
+			public void run() {
+				DbService.gradeDao.insertOrReplaceInTx(mGrade);
+				Log.i("mGrade", mGrade.size() + "");
+				Log.i("----------", "保存年级信息完成");
+			}
+		});
 		// 保存班级信息
 		for (int i = 0; i < classes.size(); i++) {
 			Long GradeID = DbService.getInstance(context).queryGradeByCode(classes.get(i).getGradeCode()).get(0)
 					.getGradeID();
 			Classes newClass = new Classes(null, GradeID, classes.get(i).getClassCode(), classes.get(i).getClassName(),
 					null);
-			DbService.getInstance(context).saveClasses(newClass);
+			mClasses.add(newClass);
 		}
-		Log.i("----------", "保存班级信息完成");
+		mAsyncSession.runInTx(new Runnable() {
+			@Override
+			public void run() {
+				DbService.classesDao.insertOrReplaceInTx(mClasses);
+				Log.i("mClasses", mClasses.size() + "");
+				Log.i("----------", "保存班级信息完成");
+			}
+		});
 		// 保存学生信息
 		for (int i = 0; i < students.size(); i++) {
-			Long ClassID = DbService.getInstance(context).queryClassesByCode(students.get(i).getClassCode()).get(0)
-					.getClassID();
-			Long GradeID = DbService.getInstance(context).queryGradeByCode(students.get(i).getGradeCode()).get(0)
-					.getGradeID();
 			Student student = new Student(null, students.get(i).getStudentCode(), students.get(i).getStudentName(),
-					students.get(i).getSex(), ClassID, GradeID, students.get(i).getIDCardNo(),
-					students.get(i).getICCardNo(), students.get(i).getDownloadTime(), null, null, null);
-			flag = DbService.getInstance(context).saveStudent(student);
+					students.get(i).getSex(), students.get(i).getClassCode(), students.get(i).getGradeCode(),
+					students.get(i).getIDCardNo(), students.get(i).getICCardNo(), students.get(i).getDownloadTime(),
+					null, null, null);
+			mStudents.add(student);
+			// flag = DbService.getInstance(context).saveStudent(student);
 		}
-		Log.i("students", students.size() + "");
-		Log.i("----------", "保存学生信息完成");
-		if (students.size() != 0 && flag != -1) {
+		mAsyncSession.runInTx(new Runnable() {
+			@Override
+			public void run() {
+				DbService.studentDao.insertOrReplaceInTx(mStudents);
+				Log.i("students", mStudents.size() + "");
+				Log.i("----------", "保存学生信息完成");
+			}
+		});
+		if (mStudents.size() != 0 && flag != -1) {
 			return 1;
 		} else {
 			return 0;
@@ -138,20 +166,21 @@ public class SaveDBUtil {
 	 */
 	public static void saveStudentItemDB(List<PH_StudentItem> studentItems, Context context) {
 		Log.i("studentItems.size()=", studentItems.size() + "");
+		mStudentItems = new ArrayList<>();
 		for (PH_StudentItem stuItem : studentItems) {
 			String itemCode = stuItem.getItemCode();
 			String studentCode = stuItem.getStudentCode();
-//			List<Item> items = DbService.getInstance(context).queryItemByCode(itemCode);
-//			List<Student> stus = DbService.getInstance(context).queryStudentByCode(studentCode);
-//			Long StudentID = null;
-//			Long ItemID = null;
-//			if (stus.size() != 0 && items.size() != 0) {
-//				StudentID = stus.get(0).getStudentID();
-//				ItemID = items.get(0).getItemID();
-//			}
 			StudentItem studentItem = new StudentItem(null, studentCode, itemCode, null, 0, null, 0, null, null, null);
-			DbService.getInstance(context).saveStudentItem(studentItem);
+			mStudentItems.add(studentItem);
 		}
+		mAsyncSession.runInTx(new Runnable() {
+			@Override
+			public void run() {
+				DbService.studentItemDao.insertOrReplaceInTx(mStudentItems);
+				Log.i("mStudentItems", mStudentItems.size() + "");
+				Log.i("----------", "保存学生项目信息完成");
+			}
+		});
 		Notification.Builder builder = new Notification.Builder(context);
 		builder.setSmallIcon(R.drawable.app);
 		builder.setLargeIcon(BitmapFactory.decodeResource(context.getResources(), R.drawable.app));
@@ -190,9 +219,10 @@ public class SaveDBUtil {
 	public static int saveGradesDB(Context context, String stuCode, String etChengji, int resultState, String code,
 			String tvTitle) {
 		int RoundNo = 1;
-//		long studentID = DbService.getInstance(context).queryStudentByCode(stuCode).get(0).getStudentID();
-//		long ItemID = -1;
-		String itemCode="";
+		// long studentID =
+		// DbService.getInstance(context).queryStudentByCode(stuCode).get(0).getStudentID();
+		// long ItemID = -1;
+		String itemCode = "";
 		if (tvTitle.equals("身高") || tvTitle.equals("体重") || tvTitle.equals("1000米跑") || tvTitle.equals("800米跑")
 				|| tvTitle.equals("左眼视力") || tvTitle.equals("右眼视力")) {
 			itemCode = DbService.getInstance(context).queryItemByName(tvTitle).get(0).getItemCode();

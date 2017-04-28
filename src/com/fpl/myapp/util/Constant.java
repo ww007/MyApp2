@@ -37,10 +37,10 @@ public interface Constant {
 	 */
 	public static final int REQUEST_SCAN_MODE_ALL_MODE = 0X300;
 
-	public static final String STUDENT_URL = "http://119.23.60.78:8080/sys_tccx/phone/studentInfo/getInfo.action";
-	public static final String ITEM_URL = "http://119.23.60.78:8080/sys_tccx/phone/item/getItems.action";
-	public static final String STUDENT_ITEM_URL = "http://119.23.60.78:8080/sys_tccx/phone/StuItem/getStuItems.action";
-	public static final String STUDENT_ITEM_SAVE_URL = "http://119.23.60.78:8080/sys_tccx/phone/StuItem/saveStuItem.action";
+	public static final String STUDENT_URL = "http://192.168.0.65:8080/sys_tccx/phone/studentInfo/getInfo.action";
+	public static final String ITEM_URL = "http://192.168.0.65:8080/sys_tccx/phone/item/getItems.action";
+	public static final String STUDENT_ITEM_URL = "http://192.168.0.65:8080/sys_tccx/phone/StuItem/getStuItems.action";
+	public static final String STUDENT_ITEM_SAVE_URL = "http://192.168.0.65:8080/sys_tccx/phone/StuItem/saveStuItem.action";
 	public static final String ROUND_RESULT_SAVE_URL = "/sys_tccx/phone/RoundResult/saveRoundResult.action";
 
 	public static final String TOKEN = "fpl@*!";

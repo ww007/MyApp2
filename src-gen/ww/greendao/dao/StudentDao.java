@@ -27,8 +27,8 @@ public class StudentDao extends AbstractDao<Student, Long> {
         public final static Property StudentCode = new Property(1, String.class, "StudentCode", false, "STUDENT_CODE");
         public final static Property StudentName = new Property(2, String.class, "StudentName", false, "STUDENT_NAME");
         public final static Property Sex = new Property(3, Integer.class, "Sex", false, "SEX");
-        public final static Property ClassID = new Property(4, Long.class, "ClassID", false, "CLASS_ID");
-        public final static Property GradeID = new Property(5, Long.class, "GradeID", false, "GRADE_ID");
+        public final static Property ClassCode = new Property(4, String.class, "ClassCode", false, "CLASS_CODE");
+        public final static Property GradeCode = new Property(5, String.class, "GradeCode", false, "GRADE_CODE");
         public final static Property IDCardNo = new Property(6, String.class, "IDCardNo", false, "IDCARD_NO");
         public final static Property ICCardNo = new Property(7, String.class, "ICCardNo", false, "ICCARD_NO");
         public final static Property DownloadTime = new Property(8, String.class, "DownloadTime", false, "DOWNLOAD_TIME");
@@ -54,8 +54,8 @@ public class StudentDao extends AbstractDao<Student, Long> {
                 "'STUDENT_CODE' TEXT UNIQUE ," + // 1: StudentCode
                 "'STUDENT_NAME' TEXT," + // 2: StudentName
                 "'SEX' INTEGER," + // 3: Sex
-                "'CLASS_ID' INTEGER," + // 4: ClassID
-                "'GRADE_ID' INTEGER," + // 5: GradeID
+                "'CLASS_CODE' TEXT," + // 4: ClassCode
+                "'GRADE_CODE' TEXT," + // 5: GradeCode
                 "'IDCARD_NO' TEXT," + // 6: IDCardNo
                 "'ICCARD_NO' TEXT," + // 7: ICCardNo
                 "'DOWNLOAD_TIME' TEXT," + // 8: DownloadTime
@@ -95,14 +95,14 @@ public class StudentDao extends AbstractDao<Student, Long> {
             stmt.bindLong(4, Sex);
         }
  
-        Long ClassID = entity.getClassID();
-        if (ClassID != null) {
-            stmt.bindLong(5, ClassID);
+        String ClassCode = entity.getClassCode();
+        if (ClassCode != null) {
+            stmt.bindString(5, ClassCode);
         }
  
-        Long GradeID = entity.getGradeID();
-        if (GradeID != null) {
-            stmt.bindLong(6, GradeID);
+        String GradeCode = entity.getGradeCode();
+        if (GradeCode != null) {
+            stmt.bindString(6, GradeCode);
         }
  
         String IDCardNo = entity.getIDCardNo();
@@ -150,8 +150,8 @@ public class StudentDao extends AbstractDao<Student, Long> {
             cursor.isNull(offset + 1) ? null : cursor.getString(offset + 1), // StudentCode
             cursor.isNull(offset + 2) ? null : cursor.getString(offset + 2), // StudentName
             cursor.isNull(offset + 3) ? null : cursor.getInt(offset + 3), // Sex
-            cursor.isNull(offset + 4) ? null : cursor.getLong(offset + 4), // ClassID
-            cursor.isNull(offset + 5) ? null : cursor.getLong(offset + 5), // GradeID
+            cursor.isNull(offset + 4) ? null : cursor.getString(offset + 4), // ClassCode
+            cursor.isNull(offset + 5) ? null : cursor.getString(offset + 5), // GradeCode
             cursor.isNull(offset + 6) ? null : cursor.getString(offset + 6), // IDCardNo
             cursor.isNull(offset + 7) ? null : cursor.getString(offset + 7), // ICCardNo
             cursor.isNull(offset + 8) ? null : cursor.getString(offset + 8), // DownloadTime
@@ -169,8 +169,8 @@ public class StudentDao extends AbstractDao<Student, Long> {
         entity.setStudentCode(cursor.isNull(offset + 1) ? null : cursor.getString(offset + 1));
         entity.setStudentName(cursor.isNull(offset + 2) ? null : cursor.getString(offset + 2));
         entity.setSex(cursor.isNull(offset + 3) ? null : cursor.getInt(offset + 3));
-        entity.setClassID(cursor.isNull(offset + 4) ? null : cursor.getLong(offset + 4));
-        entity.setGradeID(cursor.isNull(offset + 5) ? null : cursor.getLong(offset + 5));
+        entity.setClassCode(cursor.isNull(offset + 4) ? null : cursor.getString(offset + 4));
+        entity.setGradeCode(cursor.isNull(offset + 5) ? null : cursor.getString(offset + 5));
         entity.setIDCardNo(cursor.isNull(offset + 6) ? null : cursor.getString(offset + 6));
         entity.setICCardNo(cursor.isNull(offset + 7) ? null : cursor.getString(offset + 7));
         entity.setDownloadTime(cursor.isNull(offset + 8) ? null : cursor.getString(offset + 8));

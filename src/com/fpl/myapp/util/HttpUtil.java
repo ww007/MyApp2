@@ -14,16 +14,19 @@ import org.apaches.commons.codec.digest.DigestUtils;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.fpl.myapp.db.DbService;
+import com.fpl.myapp.db.GreenDaoHelper;
 import com.fpl.myapp.db.SaveDBUtil;
 import com.fpl.myapp.entity.PH_Student;
 import com.fpl.myapp.entity.PH_StudentItem;
 import android.content.Context;
 import android.util.Log;
 import android.widget.Toast;
+import de.greenrobot.dao.async.AsyncSession;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
 import ww.greendao.dao.Item;
+import ww.greendao.dao.StudentDao;
 
 public class HttpUtil {
 	private static List<PH_StudentItem> studentItems;
@@ -145,6 +148,7 @@ public class HttpUtil {
 	 * 获取学生信息
 	 * 
 	 * @param context
+	 * @param mAsyncSession
 	 * @return
 	 */
 	public static int getStudentInfo(final Context context) {
@@ -198,7 +202,6 @@ public class HttpUtil {
 					long time1 = System.currentTimeMillis();
 					studentItems = JSON.parseArray(response, PH_StudentItem.class);
 					if (DbService.getInstance(context).loadAllStudentItem().size() != studentItems.size()) {
-						// Toast.makeText(context, "正在初始化数据，请稍等4~5分钟",
 						// Toast.LENGTH_SHORT).show();
 						SaveDBUtil.saveStudentItemDB(studentItems, context);
 					} else {
@@ -243,7 +246,7 @@ public class HttpUtil {
 						DbService.getInstance(context).saveItemLists(itemList);
 						Log.i("success", "保存项目信息成功");
 					} else {
-						Log.i("存在", "项目信息已存在");
+						Log.i("fail", "项目信息已存在");
 					}
 				}
 

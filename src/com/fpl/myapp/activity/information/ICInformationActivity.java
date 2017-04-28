@@ -41,6 +41,7 @@ public class ICInformationActivity extends NFCActivity {
 	private ListView lvIcInfo;
 	private TextView tvShow;
 	private SharedPreferences sharedPreferences;
+
 	public ArrayList<String> projects = new ArrayList<>();
 	private String[] newProject;
 	private String[] newValue;
@@ -58,6 +59,7 @@ public class ICInformationActivity extends NFCActivity {
 			tvShow.setText("读取中...");
 		}
 	};
+	private ICInfo icInfo1;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -68,31 +70,34 @@ public class ICInformationActivity extends NFCActivity {
 		int selected = sharedPreferences.getInt("size", 0);
 		Log.i("selected=", selected + "");
 
-		items = DbService.getInstance(this).loadAllItem();
+		icInfo = new ICInfo();
+		icInfo1 = new ICInfo();
 
-		if (items.isEmpty()) {
-			projects.add("身高");
-			projects.add("体重");
-			projects.add("肺活量");
-			projects.add("50米跑");
-			projects.add("立定跳远");
-			projects.add("仰卧起坐");
-			projects.add("坐位体前屈");
-			projects.add("引体向上");
-			projects.add("800米跑");
-			projects.add("1000米跑");
-		} else {
-			for (Item item : items) {
-				if (item.getMachineCode().equals("9")) {
-					projects.add("左眼视力");
-					projects.add("右眼视力");
-				} else {
-					projects.add(item.getItemName());
-				}
-			}
-		}
+		// items = DbService.getInstance(this).loadAllItem();
 
-		Log.i("projects=", projects.toString());
+		// if (items.isEmpty()) {
+		// projects.add("身高");
+		// projects.add("体重");
+		// projects.add("肺活量");
+		// projects.add("50米跑");
+		// projects.add("立定跳远");
+		// projects.add("仰卧起坐");
+		// projects.add("坐位体前屈");
+		// projects.add("引体向上");
+		// projects.add("800米跑");
+		// projects.add("1000米跑");
+		// } else {
+		// for (Item item : items) {
+		// if (item.getMachineCode().equals("9")) {
+		// projects.add("左眼视力");
+		// projects.add("右眼视力");
+		// } else {
+		// projects.add(item.getItemName());
+		// }
+		// }
+		// }
+
+		// Log.i("projects=", projects.toString());
 
 		initView();
 		setListener();
@@ -105,12 +110,78 @@ public class ICInformationActivity extends NFCActivity {
 
 	}
 
+	private void readCard(Intent intent) {
+		NFCItemServiceImpl itemService;
+		try {
+			itemService = new NFCItemServiceImpl(intent);
+			Student student = itemService.IC_ReadStuInfo();
+			Log.i("StudentTest===", student.toString());
+			if (1 == student.getSex()) {
+				sex = "男";
+			} else {
+				sex = "女";
+			}
+
+			tvGender.setText(sex);
+			tvName.setText(student.getStuName().toString());
+			tvNumber.setText(student.getStuCode().toString());
+
+			readHW(itemService);
+			readMiddleRun(itemService);
+			readVision(itemService);
+			readCommon(itemService, Constant.BASKETBALL_SKILL, "ms", "篮球运球");
+			readCommon(itemService, Constant.BROAD_JUMP, "cm", "立定跳远");
+			readCommon(itemService, Constant.FOOTBALL_SKILL, "ms", "足球运球");
+			readCommon(itemService, Constant.INFRARED_BALL, "cm", "实心球");
+			readCommon(itemService, Constant.JUMP_HEIGHT, "cm", "摸高");
+			readCommon(itemService, Constant.KICKING_SHUTTLECOCK, "个", "踢毽子");
+			readCommon(itemService, Constant.PULL_UP, "个", "引体向上");
+			readCommon(itemService, Constant.PUSH_UP, "个", "俯卧撑");
+			readCommon(itemService, Constant.ROPE_SKIPPING, "个", "跳绳");
+			readCommon(itemService, Constant.RUN50, "ms", "50米跑");
+			readCommon(itemService, Constant.SHUTTLE_RUN, "ms", "折返跑");
+			readCommon(itemService, Constant.SIT_AND_REACH, "mm", "坐位体前屈");
+			readCommon(itemService, Constant.SIT_UP, "个", "仰卧起坐");
+			readCommon(itemService, Constant.SWIM, "ms", "游泳");
+			readCommon(itemService, Constant.VITAL_CAPACITY, "ml", "肺活量");
+			readCommon(itemService, Constant.VOLLEYBALL, "ms", "排球");
+			readCommon(itemService, Constant.WALKING1500, "ms", "1500米健步走");
+			readCommon(itemService, Constant.WALKING2000, "ms", "2000米健步走");
+
+			updateView();
+
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
+	}
+
+	private void readCommon(NFCItemServiceImpl itemService, int code, String unit, String name) {
+		IC_ItemResult itemResult;
+		try {
+			itemResult = itemService.IC_ReadItemResult(code);
+			Log.d(name + "：", itemResult.toString());
+			if (itemResult.getResult()[0].getResultFlag() != 1) {
+				Log.i(code + "", name + "没有成绩");
+			} else {
+				icInfo.setProjectTitle(name);
+				icInfo.setProjectValue(itemResult.getResult()[0].getResultVal() + unit);
+				icInfos.add(icInfo);
+			}
+
+		} catch (Exception e) {
+			log.debug("此IC卡中没有" + name + "项目");
+		}
+
+	}
+
 	/**
 	 * 读卡
 	 * 
 	 * @param intent
 	 */
-	private void readCard(final Intent intent) {
+	private void readCard1(final Intent intent) {
 		try {
 			NFCItemServiceImpl itemService = new NFCItemServiceImpl(intent);
 			Student student = itemService.IC_ReadStuInfo();
@@ -167,7 +238,6 @@ public class ICInformationActivity extends NFCActivity {
 					}
 				}
 			} else {
-
 				for (int i = 0; i < items.size(); i++) {
 					switch (items.get(i).getMachineCode()) {
 					case "" + Constant.RUN50:
@@ -315,13 +385,16 @@ public class ICInformationActivity extends NFCActivity {
 			itemResultVision = itemService.IC_ReadItemResult(Constant.VISION);
 			Log.i("读取视力测试", itemResultVision.toString());
 			if (itemResultVision.getResult()[0].getResultFlag() != 1) {
-				newValue[numberLSL] = "（未测）";
-				newValue[numberRSL] = "（未测）";
+				Log.i("", "视力没有数据");
 			} else {
 				double left = itemResultVision.getResult()[0].getResultVal();
 				double right = itemResultVision.getResult()[2].getResultVal();
-				newValue[numberLSL] = left + "";
-				newValue[numberRSL] = right + "";
+				icInfo.setProjectTitle("左眼视力");
+				icInfo.setProjectValue(left + "");
+				icInfo1.setProjectTitle("右眼视力");
+				icInfo1.setProjectValue(right + "");
+				icInfos.add(icInfo);
+				icInfos.add(icInfo1);
 			}
 		} catch (Exception e) {
 			log.debug("此IC卡中没有视力项目");
@@ -342,18 +415,20 @@ public class ICInformationActivity extends NFCActivity {
 			itemResultMiddleRace = itemService.IC_ReadItemResult(Constant.MIDDLE_RACE);
 			Log.i("读取中长跑测试", itemResultMiddleRace.toString());
 			if (sex.equals("女")) {
-				newValue[number1000] = "（无）";
 				if (itemResultMiddleRace.getResult()[0].getResultFlag() != 1) {
-					newValue[number800] = "（未测）";
+					Log.i("", "800米跑没有成绩");
 				} else {
-					newValue[number800] = itemResultMiddleRace.getResult()[0].getResultVal() + " ms";
+					icInfo.setProjectTitle("800米跑");
+					icInfo.setProjectValue(itemResultMiddleRace.getResult()[0].getResultVal() + " ms");
+					icInfos.add(icInfo);
 				}
 			} else {
-				newValue[number800] = "（无）";
 				if (itemResultMiddleRace.getResult()[0].getResultFlag() != 1) {
-					newValue[number1000] = "（未测）";
+					Log.i("", "1000米跑没有成绩");
 				} else {
-					newValue[number1000] = itemResultMiddleRace.getResult()[0].getResultVal() + " ms";
+					icInfo.setProjectTitle("1000米跑");
+					icInfo.setProjectValue(itemResultMiddleRace.getResult()[0].getResultVal() + " ms");
+					icInfos.add(icInfo);
 				}
 			}
 		} catch (Exception e) {
@@ -375,13 +450,18 @@ public class ICInformationActivity extends NFCActivity {
 			itemResultHW = itemService.IC_ReadItemResult(Constant.HEIGHT_WEIGHT);
 			Log.i("读取身高体重测试", itemResultHW.toString());
 			if (itemResultHW.getResult()[0].getResultFlag() != 1) {
-				newValue[numberH] = "（未测）";
-				newValue[numberW] = "（未测）";
+				Log.i("", "身高体重没有数据");
 			} else {
 				double height = itemResultHW.getResult()[0].getResultVal();
 				double weight = itemResultHW.getResult()[2].getResultVal();
 				newValue[numberH] = height / 10 + " cm";
 				newValue[numberW] = weight / 1000 + " kg";
+				icInfo.setProjectTitle("身高");
+				icInfo.setProjectValue(height / 10 + " cm");
+				icInfo1.setProjectTitle("体重");
+				icInfo1.setProjectValue(weight / 1000 + " kg");
+				icInfos.add(icInfo);
+				icInfos.add(icInfo1);
 			}
 		} catch (Exception e) {
 			log.debug("此IC卡中没有身高体重项目");
@@ -410,6 +490,9 @@ public class ICInformationActivity extends NFCActivity {
 				newValue[number] = "（未测）";
 			} else {
 				newValue[number] = itemResult.getResult()[0].getResultVal() + unit;
+				icInfo.setProjectTitle("50米跑");
+				icInfo.setProjectValue(newValue[number]);
+				icInfos.add(icInfo);
 			}
 		} catch (Exception e) {
 			log.debug("此IC卡中没有项目机器代码为" + code + "的项目");
@@ -440,21 +523,21 @@ public class ICInformationActivity extends NFCActivity {
 
 	private void updateView() {
 		// 获取数据
-		getData();
 		mAdapter = new ICInfoAdapter(this, icInfos);
 		Log.i("icInfos", icInfos + "");
 		lvIcInfo.setAdapter(mAdapter);
+		tvShow.setText("读取完毕!");
 	}
 
-	public void getData() {
-
-		for (int i = 0; i < newProject.length; i++) {
-			icInfo = new ICInfo();
-			icInfo.setProjectTitle(newProject[i]);
-			icInfo.setProjectValue(newValue[i]);
-			icInfos.add(icInfo);
-		}
-	}
+	// public void getData() {
+	//
+	// for (int i = 0; i < newProject.length; i++) {
+	// icInfo = new ICInfo();
+	// icInfo.setProjectTitle(newProject[i]);
+	// icInfo.setProjectValue(newValue[i]);
+	// icInfos.add(icInfo);
+	// }
+	// }
 
 	private void setListener() {
 

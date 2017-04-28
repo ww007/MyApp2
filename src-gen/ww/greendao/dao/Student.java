@@ -10,8 +10,8 @@ public class Student {
     private String StudentCode;
     private String StudentName;
     private Integer Sex;
-    private Long ClassID;
-    private Long GradeID;
+    private String ClassCode;
+    private String GradeCode;
     private String IDCardNo;
     private String ICCardNo;
     private String DownloadTime;
@@ -26,13 +26,13 @@ public class Student {
         this.StudentID = StudentID;
     }
 
-    public Student(Long StudentID, String StudentCode, String StudentName, Integer Sex, Long ClassID, Long GradeID, String IDCardNo, String ICCardNo, String DownloadTime, String Remark1, String Remark2, String Remark3) {
+    public Student(Long StudentID, String StudentCode, String StudentName, Integer Sex, String ClassCode, String GradeCode, String IDCardNo, String ICCardNo, String DownloadTime, String Remark1, String Remark2, String Remark3) {
         this.StudentID = StudentID;
         this.StudentCode = StudentCode;
         this.StudentName = StudentName;
         this.Sex = Sex;
-        this.ClassID = ClassID;
-        this.GradeID = GradeID;
+        this.ClassCode = ClassCode;
+        this.GradeCode = GradeCode;
         this.IDCardNo = IDCardNo;
         this.ICCardNo = ICCardNo;
         this.DownloadTime = DownloadTime;
@@ -73,20 +73,20 @@ public class Student {
         this.Sex = Sex;
     }
 
-    public Long getClassID() {
-        return ClassID;
+    public String getClassCode() {
+        return ClassCode;
     }
 
-    public void setClassID(Long ClassID) {
-        this.ClassID = ClassID;
+    public void setClassCode(String ClassCode) {
+        this.ClassCode = ClassCode;
     }
 
-    public Long getGradeID() {
-        return GradeID;
+    public String getGradeCode() {
+        return GradeCode;
     }
 
-    public void setGradeID(Long GradeID) {
-        this.GradeID = GradeID;
+    public void setGradeCode(String GradeCode) {
+        this.GradeCode = GradeCode;
     }
 
     public String getIDCardNo() {

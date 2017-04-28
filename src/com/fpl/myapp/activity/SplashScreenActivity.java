@@ -2,6 +2,7 @@ package com.fpl.myapp.activity;
 
 import com.fpl.myapp2.R;
 import com.fpl.myapp.db.DbService;
+import com.fpl.myapp.db.GreenDaoHelper;
 import com.fpl.myapp.util.HttpUtil;
 import com.fpl.myapp.util.NetUtil;
 
@@ -10,7 +11,9 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
+import android.util.Log;
 import android.widget.Toast;
+import de.greenrobot.dao.async.AsyncSession;
 
 /**
  * 开机引导界面
@@ -21,6 +24,7 @@ public class SplashScreenActivity extends Activity {
 	private int SPLASH_TIME_OUT = 2000;
 	private Handler mHandle = new Handler();;
 	private Context context;
+	private AsyncSession mAsyncSession;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -34,16 +38,16 @@ public class SplashScreenActivity extends Activity {
 
 	}
 
-
 	private void isWifiConnected(boolean result) {
 		if (true == result) {
 			if (DbService.getInstance(context).loadAllStudentItem().isEmpty()) {
 
 				HttpUtil.getItemInfo(context);
 
-				HttpUtil.getStudentInfo(context);
+				int m = HttpUtil.getStudentInfo(context);
+				Log.i("<------>", m + "");
 
-				HttpUtil.getStudentItemInfo(context);
+//				HttpUtil.getStudentItemInfo(context);
 				if (HttpUtil.okFlag == 3000) {
 					SPLASH_TIME_OUT = 2000;
 				} else {
