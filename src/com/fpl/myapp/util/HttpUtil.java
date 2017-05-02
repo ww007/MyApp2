@@ -8,25 +8,26 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
 import org.apaches.commons.codec.digest.DigestUtils;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.fpl.myapp.db.DbService;
-import com.fpl.myapp.db.GreenDaoHelper;
 import com.fpl.myapp.db.SaveDBUtil;
+import com.fpl.myapp.entity.First_StudentItem;
 import com.fpl.myapp.entity.PH_Student;
 import com.fpl.myapp.entity.PH_StudentItem;
 import android.content.Context;
 import android.util.Log;
 import android.widget.Toast;
-import de.greenrobot.dao.async.AsyncSession;
+import okhttp3.Call;
+import okhttp3.Callback;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
 import ww.greendao.dao.Item;
-import ww.greendao.dao.StudentDao;
 
 public class HttpUtil {
 	private static List<PH_StudentItem> studentItems;
@@ -40,6 +41,7 @@ public class HttpUtil {
 	 * @param params
 	 * @param listener
 	 */
+
 	public static int sendOkhttp(final String path, final Map<String, String> params,
 			final HttpCallbackListener listener) {
 		new Thread(new Runnable() {
@@ -87,11 +89,100 @@ public class HttpUtil {
 
 	}
 
+	public static int sendOkhttp1(final String path, final int i, final Map<String, String> params,
+			final HttpCallbackListener listener) {
+		new Thread(new Runnable() {
+			@Override
+			public void run() {
+				// 创建okHttpClient对象
+				OkHttpClient mOkHttpClient = new OkHttpClient();
+				StringBuilder stringBuilder = new StringBuilder();
+				stringBuilder.append(path).append("?pageNo=" + i + "&");
+				try {
+					if (params != null && params.size() != 0) {
+						for (Map.Entry<String, String> entry : params.entrySet()) {
+							// 转换成UTF-8
+							stringBuilder.append(entry.getKey()).append("=")
+									.append(URLEncoder.encode(entry.getValue(), "utf-8"));
+
+							stringBuilder.append("&");
+						}
+					}
+					// 连接signature
+					stringBuilder.append("signature=" + getSignatureVal1(params, i));
+					Log.i("---------", stringBuilder.toString());
+					// 创建一个Request
+					Request request = new Request.Builder().url(stringBuilder.toString()).build();
+					Response response = mOkHttpClient.newCall(request).execute();
+					if (response.isSuccessful()) {
+						String result = response.body().string();
+						Log.i("下载成功", result);
+						okFlag = 1;
+						listener.onFinish(result);
+					} else {
+						okFlag = 3000;
+						throw new IOException("Unexpected code " + response);
+					}
+				} catch (UnsupportedEncodingException e) {
+					okFlag = 3000;
+					e.printStackTrace();
+				} catch (IOException e) {
+					okFlag = 3000;
+					e.printStackTrace();
+				}
+			}
+		}).start();
+		return okFlag;
+
+	}
+
+	public static int sendOkhttp2(final String path, final int i, final Map<String, String> params,
+			final Context context, final int totalPage) {
+		// 创建okHttpClient对象
+		OkHttpClient mOkHttpClient = new OkHttpClient();
+		StringBuilder stringBuilder = new StringBuilder();
+		stringBuilder.append(path).append("?pageNo=" + i + "&");
+		try {
+			if (params != null && params.size() != 0) {
+				for (Map.Entry<String, String> entry : params.entrySet()) {
+					// 转换成UTF-8
+					stringBuilder.append(entry.getKey()).append("=")
+							.append(URLEncoder.encode(entry.getValue(), "utf-8"));
+
+					stringBuilder.append("&");
+				}
+			}
+			// 连接signature
+			stringBuilder.append("signature=" + getSignatureVal1(params, i));
+			Log.i("---------", stringBuilder.toString());
+			// 创建一个Request
+			Request request = new Request.Builder().url(stringBuilder.toString()).build();
+			Response response = mOkHttpClient.newCall(request).execute();
+			if (response.isSuccessful()) {
+				String result = response.body().string();
+				Log.i("下载成功", result);
+				okFlag = 1;
+			} else {
+				okFlag = 3000;
+				throw new IOException("Unexpected code " + response);
+			}
+		} catch (UnsupportedEncodingException e) {
+			okFlag = 3000;
+			e.printStackTrace();
+		} catch (IOException e) {
+			okFlag = 3000;
+			e.printStackTrace();
+		}
+		return okFlag;
+
+	}
+
 	/**
 	 * MD5加密
 	 * 
 	 * @param paramMap
 	 *            加密参数
+	 * @param i
 	 * @return
 	 */
 	public static String getSignatureVal(Map<String, String> paramMap) {
@@ -104,6 +195,31 @@ public class HttpUtil {
 					list.add(entry.getValue());
 				}
 			}
+			// 字典排序
+			Collections.sort(list);
+			for (int i = 0; i < list.size(); i++) {
+				stringBuilder.append(list.get(i));
+			}
+			stringBuilder.append(Constant.TOKEN);
+			return HttpUtil.getMD5(stringBuilder.toString());
+		} catch (Exception e) {
+			// TODO: handle exception
+			return null;
+		}
+	}
+
+	public static String getSignatureVal1(Map<String, String> paramMap, int pageNo) {
+		try {
+			StringBuilder stringBuilder = new StringBuilder();
+			List<String> list = new ArrayList<String>();
+			if (paramMap != null && paramMap.size() != 0) {
+				for (Map.Entry<String, String> entry : paramMap.entrySet()) {
+					list.add(entry.getKey());
+					list.add(entry.getValue());
+				}
+			}
+			list.add("pageNo");
+			list.add(pageNo + "");
 			// 字典排序
 			Collections.sort(list);
 			for (int i = 0; i < list.size(); i++) {
@@ -185,6 +301,53 @@ public class HttpUtil {
 		}
 	}
 
+	public static void sendOkhttp0(final String path, final int i, final Map<String, String> params,
+			final Context context) {
+		new Thread(new Runnable() {
+			@Override
+			public void run() {
+				final OkHttpClient client = new OkHttpClient().newBuilder().readTimeout(10, TimeUnit.SECONDS).build();
+				StringBuilder stringBuilder = new StringBuilder();
+				stringBuilder.append(path).append("?pageNo=" + i + "&");
+				if (params != null && params.size() != 0) {
+					for (Map.Entry<String, String> entry : params.entrySet()) {
+						// 转换成UTF-8
+						try {
+							stringBuilder.append(entry.getKey()).append("=")
+									.append(URLEncoder.encode(entry.getValue(), "utf-8"));
+						} catch (UnsupportedEncodingException e) {
+							e.printStackTrace();
+						}
+						stringBuilder.append("&");
+					}
+				}
+				// 连接signature
+				stringBuilder.append("signature=" + getSignatureVal1(params, i));
+				Request request = new Request.Builder().url(stringBuilder.toString()).get().build();
+				final Call call = client.newCall(request);
+				call.enqueue(new Callback() {
+					@Override
+					public void onResponse(Call arg0, Response response) throws IOException {
+						String result = response.body().string();
+						First_StudentItem currentStuItem = JSON.parseObject(result, First_StudentItem.class);
+						int totalPage = currentStuItem.getTotalPage();
+						studentItems.addAll(currentStuItem.getResult());
+						Log.i("当前页--当前大小", currentStuItem.getPageNo() + "--" + studentItems.size());
+						if (studentItems.size() == currentStuItem.getTotalCount()) {
+							SaveDBUtil.saveStudentItemDB(studentItems, context, totalPage);
+						}
+					}
+
+					@Override
+					public void onFailure(Call arg0, IOException arg1) {
+						client.newCall(call.request()).enqueue(this);
+						Log.e("下载失败", arg1 + "" + i);
+					}
+				});
+			}
+		}).start();
+	}
+
 	/**
 	 * 获取学生项目信息
 	 * 
@@ -195,22 +358,57 @@ public class HttpUtil {
 			String m = getMD5("fpl@*!");
 			Map<String, String> map = new HashMap<>();
 			map.put("signature", m);
-			// 请求学生项目成绩信息
-			sendOkhttp(Constant.STUDENT_ITEM_URL, null, new HttpCallbackListener() {
+			// sendOkhttp0(Constant.STUDENT_ITEM_URL, 1, null, context, 0);
+			sendOkhttp1(Constant.STUDENT_ITEM_URL, 1, null, new HttpCallbackListener() {
+
 				@Override
 				public void onFinish(String response) {
-					long time1 = System.currentTimeMillis();
-					studentItems = JSON.parseArray(response, PH_StudentItem.class);
-					if (DbService.getInstance(context).loadAllStudentItem().size() != studentItems.size()) {
+					final long time1 = System.currentTimeMillis();
+					First_StudentItem firstStudentItems = JSON.parseObject(response, First_StudentItem.class);
+					int totalPage = firstStudentItems.getTotalPage();
+					Log.i("学生项目总数", firstStudentItems.getTotalCount() + "");
+					Log.i("总页数", firstStudentItems.getTotalPage() + "");
+					if (DbService.getInstance(context).loadAllStudentItem().size() != firstStudentItems
+							.getTotalCount()) {
 						// Toast.LENGTH_SHORT).show();
-						SaveDBUtil.saveStudentItemDB(studentItems, context);
+						// SaveDBUtil.saveStudentItemDB(studentItems, context,
+						// totalPage);
+						for (int i = 1; i < totalPage + 1; i++) {
+							// sendOkhttp2(Constant.STUDENT_ITEM_URL, i, null,
+							// context, totalPage);
+							sendOkhttp0(Constant.STUDENT_ITEM_URL, i, null, context);
+							// sendOkhttp1(Constant.STUDENT_ITEM_URL, i, null,
+							// new HttpCallbackListener() {
+							//
+							// @Override
+							// public void onFinish(String response) {
+							// // JSONObject object =
+							// // JSON.parseObject(response);
+							// // JSONArray result =
+							// // object.getJSONArray("result");
+							// First_StudentItem currentStuItem =
+							// JSON.parseObject(response,
+							// First_StudentItem.class);
+							// studentItems = currentStuItem.getResult();
+							// SaveDBUtil.saveStudentItemDB(studentItems,
+							// context, totalPage);
+							// StuItemFlag = true;
+							// long time2 = System.currentTimeMillis();
+							// long t = time2 - time1;
+							// Log.i("保存学生项目成绩完成,存储用时：", t + "ms");
+							// }
+							//
+							// @Override
+							// public void onError(Exception e) {
+							// // TODO Auto-generated method stub
+							//
+							// }
+							// });
+						}
+
 					} else {
 						Log.i("存在", "学生项目已存在");
 					}
-					StuItemFlag = true;
-					long time2 = System.currentTimeMillis();
-					long t = time2 - time1;
-					Log.i("保存学生项目成绩完成,存储用时：", t + "ms");
 				}
 
 				@Override
@@ -219,6 +417,37 @@ public class HttpUtil {
 					StuItemFlag = false;
 				}
 			});
+			// 请求学生项目成绩信息
+			// sendOkhttp(Constant.STUDENT_ITEM_URL, null, new
+			// HttpCallbackListener() {
+			// @Override
+			// public void onFinish(String response) {
+			// long time1 = System.currentTimeMillis();
+			// totalStudentItems = JSON.parseArray(response,
+			// First_StudentItem.class);
+			// int totalPage = totalStudentItems.get(0).getTotalPage();
+			// for (int i = 1; i < totalPage + 1; i++) {
+			//
+			// }
+			// if (DbService.getInstance(context).loadAllStudentItem().size() !=
+			// studentItems.size()) {
+			// // Toast.LENGTH_SHORT).show();
+			// SaveDBUtil.saveStudentItemDB(studentItems, context);
+			// } else {
+			// Log.i("存在", "学生项目已存在");
+			// }
+			// StuItemFlag = true;
+			// long time2 = System.currentTimeMillis();
+			// long t = time2 - time1;
+			// Log.i("保存学生项目成绩完成,存储用时：", t + "ms");
+			// }
+			//
+			// @Override
+			// public void onError(Exception e) {
+			// Log.i("error--->", "下载学生项目失败");
+			// StuItemFlag = false;
+			// }
+			// });
 		} catch (Exception e) {
 			Toast.makeText(context, "服务器连接异常...", Toast.LENGTH_SHORT).show();
 			e.printStackTrace();

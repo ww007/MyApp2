@@ -24,7 +24,25 @@ public class SplashScreenActivity extends Activity {
 	private int SPLASH_TIME_OUT = 2000;
 	private Handler mHandle = new Handler();;
 	private Context context;
-	private AsyncSession mAsyncSession;
+	Runnable getItem = new Runnable() {
+		@Override
+		public void run() {
+			HttpUtil.getItemInfo(context);
+		}
+	};
+
+	Runnable getstuInfo = new Runnable() {
+		@Override
+		public void run() {
+			HttpUtil.getStudentInfo(context);
+		}
+	};
+	Runnable getstuItem = new Runnable() {
+		@Override
+		public void run() {
+			HttpUtil.getStudentItemInfo(context);
+		}
+	};
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -42,16 +60,14 @@ public class SplashScreenActivity extends Activity {
 		if (true == result) {
 			if (DbService.getInstance(context).loadAllStudentItem().isEmpty()) {
 
-				HttpUtil.getItemInfo(context);
-
-				int m = HttpUtil.getStudentInfo(context);
-				Log.i("<------>", m + "");
-
-//				HttpUtil.getStudentItemInfo(context);
+//				mHandle.post(getItem);
+//				mHandle.post(getstuInfo);
+//				mHandle.post(getstuItem);
+				HttpUtil.getStudentItemInfo(context);
 				if (HttpUtil.okFlag == 3000) {
 					SPLASH_TIME_OUT = 2000;
 				} else {
-					SPLASH_TIME_OUT = 60000;
+					SPLASH_TIME_OUT = 20000;
 				}
 			} else {
 				SPLASH_TIME_OUT = 2000;

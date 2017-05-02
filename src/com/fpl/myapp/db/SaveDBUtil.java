@@ -163,9 +163,11 @@ public class SaveDBUtil {
 	 * @param studentItems
 	 *            获取到的学生项目信息
 	 * @param context
+	 * @param totalPage
 	 */
-	public static void saveStudentItemDB(List<PH_StudentItem> studentItems, Context context) {
-		Log.i("studentItems.size()=", studentItems.size() + "");
+	private static int i = 1;
+
+	public static void saveStudentItemDB(List<PH_StudentItem> studentItems, Context context, int totalPage) {
 		mStudentItems = new ArrayList<>();
 		for (PH_StudentItem stuItem : studentItems) {
 			String itemCode = stuItem.getItemCode();
@@ -178,27 +180,30 @@ public class SaveDBUtil {
 			public void run() {
 				DbService.studentItemDao.insertOrReplaceInTx(mStudentItems);
 				Log.i("mStudentItems", mStudentItems.size() + "");
-				Log.i("----------", "保存学生项目信息完成");
+				Log.i("----------" + i, "保存学生项目信息完成");
 			}
 		});
-		Notification.Builder builder = new Notification.Builder(context);
-		builder.setSmallIcon(R.drawable.app);
-		builder.setLargeIcon(BitmapFactory.decodeResource(context.getResources(), R.drawable.app));
-		builder.setAutoCancel(true);
-		builder.setContentTitle("MyApp通知");
-		builder.setContentText("数据初始化完成");
-		builder.setTicker("数据初始化完成,可以开始测试");
-		builder.setDefaults(Notification.DEFAULT_SOUND);
-		// 设置点击跳转
-		Intent hangIntent = new Intent();
-		// hangIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-		// hangIntent.setClass(context, MainActivity.class);
-		// 如果描述的PendingIntent已经存在，则在产生新的Intent之前会先取消掉当前的
-		PendingIntent hangPendingIntent = PendingIntent.getActivity(context, 0, hangIntent,
-				PendingIntent.FLAG_CANCEL_CURRENT);
-		builder.setFullScreenIntent(hangPendingIntent, true);
-		notificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
-		notificationManager.notify(2, builder.build());
+		if (i == totalPage) {
+			Notification.Builder builder = new Notification.Builder(context);
+			builder.setSmallIcon(R.drawable.app);
+			builder.setLargeIcon(BitmapFactory.decodeResource(context.getResources(), R.drawable.app));
+			builder.setAutoCancel(true);
+			builder.setContentTitle("MyApp通知");
+			builder.setContentText("数据初始化完成");
+			builder.setTicker("数据初始化完成,可以开始测试");
+			builder.setDefaults(Notification.DEFAULT_SOUND);
+			// 设置点击跳转
+			Intent hangIntent = new Intent();
+			// hangIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+			// hangIntent.setClass(context, MainActivity.class);
+			// 如果描述的PendingIntent已经存在，则在产生新的Intent之前会先取消掉当前的
+			PendingIntent hangPendingIntent = PendingIntent.getActivity(context, 0, hangIntent,
+					PendingIntent.FLAG_CANCEL_CURRENT);
+			builder.setFullScreenIntent(hangPendingIntent, true);
+			notificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
+			notificationManager.notify(2, builder.build());
+		}
+		i++;
 	}
 
 	/**
