@@ -19,7 +19,7 @@ import ww.greendao.dao.Grade;
 /** 
  * DAO for table GRADE.
 */
-public class GradeDao extends AbstractDao<Grade, Long> {
+public class GradeDao extends AbstractDao<Grade, String> {
 
     public static final String TABLENAME = "GRADE";
 
@@ -28,11 +28,10 @@ public class GradeDao extends AbstractDao<Grade, Long> {
      * Can be used for QueryBuilder and for referencing column names.
     */
     public static class Properties {
-        public final static Property GradeID = new Property(0, Long.class, "GradeID", true, "GRADE_ID");
-        public final static Property SchoolID = new Property(1, Long.class, "SchoolID", false, "SCHOOL_ID");
-        public final static Property GradeCode = new Property(2, String.class, "GradeCode", false, "GRADE_CODE");
-        public final static Property GradeName = new Property(3, String.class, "GradeName", false, "GRADE_NAME");
-        public final static Property Remark1 = new Property(4, String.class, "Remark1", false, "REMARK1");
+        public final static Property SchoolID = new Property(0, Long.class, "SchoolID", false, "SCHOOL_ID");
+        public final static Property GradeCode = new Property(1, String.class, "GradeCode", true, "GRADE_CODE");
+        public final static Property GradeName = new Property(2, String.class, "GradeName", false, "GRADE_NAME");
+        public final static Property Remark1 = new Property(3, String.class, "Remark1", false, "REMARK1");
     };
 
     private DaoSession daoSession;
@@ -52,11 +51,10 @@ public class GradeDao extends AbstractDao<Grade, Long> {
     public static void createTable(SQLiteDatabase db, boolean ifNotExists) {
         String constraint = ifNotExists? "IF NOT EXISTS ": "";
         db.execSQL("CREATE TABLE " + constraint + "'GRADE' (" + //
-                "'GRADE_ID' INTEGER PRIMARY KEY AUTOINCREMENT ," + // 0: GradeID
-                "'SCHOOL_ID' INTEGER," + // 1: SchoolID
-                "'GRADE_CODE' TEXT UNIQUE ," + // 2: GradeCode
-                "'GRADE_NAME' TEXT UNIQUE ," + // 3: GradeName
-                "'REMARK1' TEXT);"); // 4: Remark1
+                "'SCHOOL_ID' INTEGER," + // 0: SchoolID
+                "'GRADE_CODE' TEXT PRIMARY KEY NOT NULL UNIQUE ," + // 1: GradeCode
+                "'GRADE_NAME' TEXT UNIQUE ," + // 2: GradeName
+                "'REMARK1' TEXT);"); // 3: Remark1
     }
 
     /** Drops the underlying database table. */
@@ -70,29 +68,24 @@ public class GradeDao extends AbstractDao<Grade, Long> {
     protected void bindValues(SQLiteStatement stmt, Grade entity) {
         stmt.clearBindings();
  
-        Long GradeID = entity.getGradeID();
-        if (GradeID != null) {
-            stmt.bindLong(1, GradeID);
-        }
- 
         Long SchoolID = entity.getSchoolID();
         if (SchoolID != null) {
-            stmt.bindLong(2, SchoolID);
+            stmt.bindLong(1, SchoolID);
         }
  
         String GradeCode = entity.getGradeCode();
         if (GradeCode != null) {
-            stmt.bindString(3, GradeCode);
+            stmt.bindString(2, GradeCode);
         }
  
         String GradeName = entity.getGradeName();
         if (GradeName != null) {
-            stmt.bindString(4, GradeName);
+            stmt.bindString(3, GradeName);
         }
  
         String Remark1 = entity.getRemark1();
         if (Remark1 != null) {
-            stmt.bindString(5, Remark1);
+            stmt.bindString(4, Remark1);
         }
     }
 
@@ -104,19 +97,18 @@ public class GradeDao extends AbstractDao<Grade, Long> {
 
     /** @inheritdoc */
     @Override
-    public Long readKey(Cursor cursor, int offset) {
-        return cursor.isNull(offset + 0) ? null : cursor.getLong(offset + 0);
+    public String readKey(Cursor cursor, int offset) {
+        return cursor.isNull(offset + 1) ? null : cursor.getString(offset + 1);
     }    
 
     /** @inheritdoc */
     @Override
     public Grade readEntity(Cursor cursor, int offset) {
         Grade entity = new Grade( //
-            cursor.isNull(offset + 0) ? null : cursor.getLong(offset + 0), // GradeID
-            cursor.isNull(offset + 1) ? null : cursor.getLong(offset + 1), // SchoolID
-            cursor.isNull(offset + 2) ? null : cursor.getString(offset + 2), // GradeCode
-            cursor.isNull(offset + 3) ? null : cursor.getString(offset + 3), // GradeName
-            cursor.isNull(offset + 4) ? null : cursor.getString(offset + 4) // Remark1
+            cursor.isNull(offset + 0) ? null : cursor.getLong(offset + 0), // SchoolID
+            cursor.isNull(offset + 1) ? null : cursor.getString(offset + 1), // GradeCode
+            cursor.isNull(offset + 2) ? null : cursor.getString(offset + 2), // GradeName
+            cursor.isNull(offset + 3) ? null : cursor.getString(offset + 3) // Remark1
         );
         return entity;
     }
@@ -124,25 +116,23 @@ public class GradeDao extends AbstractDao<Grade, Long> {
     /** @inheritdoc */
     @Override
     public void readEntity(Cursor cursor, Grade entity, int offset) {
-        entity.setGradeID(cursor.isNull(offset + 0) ? null : cursor.getLong(offset + 0));
-        entity.setSchoolID(cursor.isNull(offset + 1) ? null : cursor.getLong(offset + 1));
-        entity.setGradeCode(cursor.isNull(offset + 2) ? null : cursor.getString(offset + 2));
-        entity.setGradeName(cursor.isNull(offset + 3) ? null : cursor.getString(offset + 3));
-        entity.setRemark1(cursor.isNull(offset + 4) ? null : cursor.getString(offset + 4));
+        entity.setSchoolID(cursor.isNull(offset + 0) ? null : cursor.getLong(offset + 0));
+        entity.setGradeCode(cursor.isNull(offset + 1) ? null : cursor.getString(offset + 1));
+        entity.setGradeName(cursor.isNull(offset + 2) ? null : cursor.getString(offset + 2));
+        entity.setRemark1(cursor.isNull(offset + 3) ? null : cursor.getString(offset + 3));
      }
     
     /** @inheritdoc */
     @Override
-    protected Long updateKeyAfterInsert(Grade entity, long rowId) {
-        entity.setGradeID(rowId);
-        return rowId;
+    protected String updateKeyAfterInsert(Grade entity, long rowId) {
+        return entity.getGradeCode();
     }
     
     /** @inheritdoc */
     @Override
-    public Long getKey(Grade entity) {
+    public String getKey(Grade entity) {
         if(entity != null) {
-            return entity.getGradeID();
+            return entity.getGradeCode();
         } else {
             return null;
         }

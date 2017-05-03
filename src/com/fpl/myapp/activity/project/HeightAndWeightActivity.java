@@ -56,7 +56,7 @@ public class HeightAndWeightActivity extends NFCActivity {
 	private TextView tvRight;
 	private TextView tvTitle;
 	private Context context;
-	private List<StudentItem> studentItems;
+	private StudentItem studentItems;
 
 	private Logger log = Logger.getLogger(HeightAndWeightActivity.class);
 	private EditText etHMax;
@@ -102,8 +102,8 @@ public class HeightAndWeightActivity extends NFCActivity {
 		} else {
 			hMax = items.get(0).getMaxValue() / 10 + "";
 			hMin = items.get(0).getMinValue() / 10 + "";
-			wMax = items2.get(0).getMaxValue().toString();
-			wMin = items2.get(0).getMinValue().toString();
+			wMax = items2.get(0).getMaxValue() / 1000 + "";
+			wMin = items2.get(0).getMinValue() / 1000 + "";
 		}
 		initView();
 		setListener();
@@ -112,7 +112,7 @@ public class HeightAndWeightActivity extends NFCActivity {
 	@Override
 	public void onNewIntent(Intent intent) {
 		if (readStyle == 0) {
-			if (View.VISIBLE == tvShow1.getVisibility() && "成绩保存成功".equals(tvShow1.getText().toString())) {
+			if (View.VISIBLE == tvShow1.getVisibility() && "保存成功".equals(tvShow1.getText().toString())) {
 				writeCard(intent);
 			} else {
 				readCard(intent);
@@ -350,16 +350,9 @@ public class HeightAndWeightActivity extends NFCActivity {
 						etWeight.setText("");
 						return;
 					}
-					// 查询数据库中保存的该学生项目成绩的轮次
-					// long itemId =
-					// DbService.getInstance(context).queryItemByMachineCode("1").get(0).getItemID();
-					// long stuId =
-					// DbService.getInstance(context).queryStudentByCode(tvNumber.getText().toString()).get(0)
-					// .getStudentID();
 					studentItems = DbService.getInstance(context).queryStudentItemByCode(tvNumber.getText().toString(),
 							"E01");
-
-					if (studentItems.isEmpty()) {
+					if (studentItems==null) {
 						Toast.makeText(context, "当前学生项目不存在", Toast.LENGTH_SHORT).show();
 					} else {
 						int hResult = (int) (Double.parseDouble(etHeight.getText().toString()) * 10);

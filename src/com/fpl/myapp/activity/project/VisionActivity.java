@@ -76,7 +76,7 @@ public class VisionActivity extends NFCActivity {
 	private String stuData;
 	private List<ww.greendao.dao.Student> stuByCode;
 	private Button btnScan;
-	private List<StudentItem> studentItems;
+	private StudentItem studentItems;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -334,7 +334,7 @@ public class VisionActivity extends NFCActivity {
 					studentItems = DbService.getInstance(context).queryStudentItemByCode(tvNumber.getText().toString(),
 							itemCode);
 
-					if (studentItems.isEmpty()) {
+					if (studentItems==null) {
 						Toast.makeText(context, "当前学生项目不存在", Toast.LENGTH_SHORT).show();
 					} else {
 						int flag1 = SaveDBUtil.saveGradesDB(context, tvNumber.getText().toString(),

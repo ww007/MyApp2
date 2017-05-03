@@ -47,6 +47,7 @@ public class SaveDBUtil {
 	private static ArrayList<StudentItem> mStudentItems;
 	private static ArrayList<Classes> mClasses;
 	private static ArrayList<Grade> mGrade;
+	private static long startTime;
 
 	/**
 	 * 数据库中查询所有成绩并存入IC卡
@@ -84,6 +85,7 @@ public class SaveDBUtil {
 	 * @return
 	 */
 	public static int saveStudentDB(String response, List<PH_Student> students, Context context) {
+		startTime = System.currentTimeMillis();
 		mStudents = new ArrayList<Student>();
 		mClasses = new ArrayList<Classes>();
 		mGrade = new ArrayList<Grade>();
@@ -104,9 +106,11 @@ public class SaveDBUtil {
 		Log.i("----------", "保存学校信息完成");
 		// 保存年级信息
 		for (int i = 0; i < grades.size(); i++) {
-			Long SchoolID = DbService.getInstance(context).querySchoolByName(grades.get(i).getSchoolName().toString())
-					.get(0).getSchoolID();
-			Grade grade = new Grade(null, SchoolID, grades.get(i).getGradeCode(), grades.get(i).getGradeName(), null);
+			String schoolName = grades.get(i).getSchoolName();
+			String gradeCode = grades.get(i).getGradeCode();
+			String gradeName = grades.get(i).getGradeName();
+			Long SchoolID = DbService.getInstance(context).querySchoolByName(schoolName).get(0).getSchoolID();
+			Grade grade = new Grade(SchoolID, gradeCode, gradeName, null);
 			mGrade.add(grade);
 		}
 		mAsyncSession.runInTx(new Runnable() {
@@ -119,10 +123,10 @@ public class SaveDBUtil {
 		});
 		// 保存班级信息
 		for (int i = 0; i < classes.size(); i++) {
-			Long GradeID = DbService.getInstance(context).queryGradeByCode(classes.get(i).getGradeCode()).get(0)
-					.getGradeID();
-			Classes newClass = new Classes(null, GradeID, classes.get(i).getClassCode(), classes.get(i).getClassName(),
-					null);
+			String gradeCode = classes.get(i).getGradeCode();
+			String classCode = classes.get(i).getClassCode();
+			String className = classes.get(i).getClassName();
+			Classes newClass = new Classes(gradeCode, classCode, className, null);
 			mClasses.add(newClass);
 		}
 		mAsyncSession.runInTx(new Runnable() {
@@ -135,12 +139,11 @@ public class SaveDBUtil {
 		});
 		// 保存学生信息
 		for (int i = 0; i < students.size(); i++) {
-			Student student = new Student(null, students.get(i).getStudentCode(), students.get(i).getStudentName(),
+			Student student = new Student(students.get(i).getStudentCode(), students.get(i).getStudentName(),
 					students.get(i).getSex(), students.get(i).getClassCode(), students.get(i).getGradeCode(),
 					students.get(i).getIDCardNo(), students.get(i).getICCardNo(), students.get(i).getDownloadTime(),
 					null, null, null);
 			mStudents.add(student);
-			// flag = DbService.getInstance(context).saveStudent(student);
 		}
 		mAsyncSession.runInTx(new Runnable() {
 			@Override
@@ -165,9 +168,7 @@ public class SaveDBUtil {
 	 * @param context
 	 * @param totalPage
 	 */
-	private static int i = 1;
-
-	public static void saveStudentItemDB(List<PH_StudentItem> studentItems, Context context, int totalPage) {
+	public static void saveStudentItemDB(List<PH_StudentItem> studentItems, Context context) {
 		mStudentItems = new ArrayList<>();
 		for (PH_StudentItem stuItem : studentItems) {
 			String itemCode = stuItem.getItemCode();
@@ -179,31 +180,31 @@ public class SaveDBUtil {
 			@Override
 			public void run() {
 				DbService.studentItemDao.insertOrReplaceInTx(mStudentItems);
+				long endTime = System.currentTimeMillis();
+				long hasTime = endTime - startTime;
+				Log.i("初始化用时：", hasTime + "ms");
 				Log.i("mStudentItems", mStudentItems.size() + "");
-				Log.i("----------" + i, "保存学生项目信息完成");
+				Log.i("----------", "保存学生项目信息完成");
 			}
 		});
-		if (i == totalPage) {
-			Notification.Builder builder = new Notification.Builder(context);
-			builder.setSmallIcon(R.drawable.app);
-			builder.setLargeIcon(BitmapFactory.decodeResource(context.getResources(), R.drawable.app));
-			builder.setAutoCancel(true);
-			builder.setContentTitle("MyApp通知");
-			builder.setContentText("数据初始化完成");
-			builder.setTicker("数据初始化完成,可以开始测试");
-			builder.setDefaults(Notification.DEFAULT_SOUND);
-			// 设置点击跳转
-			Intent hangIntent = new Intent();
-			// hangIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-			// hangIntent.setClass(context, MainActivity.class);
-			// 如果描述的PendingIntent已经存在，则在产生新的Intent之前会先取消掉当前的
-			PendingIntent hangPendingIntent = PendingIntent.getActivity(context, 0, hangIntent,
-					PendingIntent.FLAG_CANCEL_CURRENT);
-			builder.setFullScreenIntent(hangPendingIntent, true);
-			notificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
-			notificationManager.notify(2, builder.build());
-		}
-		i++;
+		Notification.Builder builder = new Notification.Builder(context);
+		builder.setSmallIcon(R.drawable.app);
+		builder.setLargeIcon(BitmapFactory.decodeResource(context.getResources(), R.drawable.app));
+		builder.setAutoCancel(true);
+		builder.setContentTitle("MyApp通知");
+		builder.setContentText("数据初始化完成");
+		builder.setTicker("数据初始化完成,可以开始测试");
+		builder.setDefaults(Notification.DEFAULT_SOUND);
+		// 设置点击跳转
+		Intent hangIntent = new Intent();
+		// hangIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+		// hangIntent.setClass(context, MainActivity.class);
+		// 如果描述的PendingIntent已经存在，则在产生新的Intent之前会先取消掉当前的
+		PendingIntent hangPendingIntent = PendingIntent.getActivity(context, 0, hangIntent,
+				PendingIntent.FLAG_CANCEL_CURRENT);
+		builder.setFullScreenIntent(hangPendingIntent, true);
+		notificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
+		notificationManager.notify(2, builder.build());
 	}
 
 	/**
@@ -224,9 +225,6 @@ public class SaveDBUtil {
 	public static int saveGradesDB(Context context, String stuCode, String etChengji, int resultState, String code,
 			String tvTitle) {
 		int RoundNo = 1;
-		// long studentID =
-		// DbService.getInstance(context).queryStudentByCode(stuCode).get(0).getStudentID();
-		// long ItemID = -1;
 		String itemCode = "";
 		if (tvTitle.equals("身高") || tvTitle.equals("体重") || tvTitle.equals("1000米跑") || tvTitle.equals("800米跑")
 				|| tvTitle.equals("左眼视力") || tvTitle.equals("右眼视力")) {
@@ -235,11 +233,11 @@ public class SaveDBUtil {
 			itemCode = DbService.getInstance(context).queryItemByMachineCode(code).get(0).getItemCode();
 		}
 
-		List<StudentItem> studentItems = DbService.getInstance(context).queryStudentItemByCode(stuCode, itemCode);
-		if (studentItems.isEmpty()) {
+		StudentItem studentItems = DbService.getInstance(context).queryStudentItemByCode(stuCode, itemCode);
+		if (studentItems==null) {
 			return 0;
 		}
-		Long studentItemID = studentItems.get(0).getStudentItemID();
+		Long studentItemID = studentItems.getStudentItemID();
 		List<RoundResult> round = DbService.getInstance(context).queryRoundResultByID(studentItemID);
 		List<Integer> rounds = new ArrayList<>();
 

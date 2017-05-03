@@ -14,7 +14,7 @@ import ww.greendao.dao.Student;
 /** 
  * DAO for table STUDENT.
 */
-public class StudentDao extends AbstractDao<Student, Long> {
+public class StudentDao extends AbstractDao<Student, String> {
 
     public static final String TABLENAME = "STUDENT";
 
@@ -23,19 +23,20 @@ public class StudentDao extends AbstractDao<Student, Long> {
      * Can be used for QueryBuilder and for referencing column names.
     */
     public static class Properties {
-        public final static Property StudentID = new Property(0, Long.class, "StudentID", true, "STUDENT_ID");
-        public final static Property StudentCode = new Property(1, String.class, "StudentCode", false, "STUDENT_CODE");
-        public final static Property StudentName = new Property(2, String.class, "StudentName", false, "STUDENT_NAME");
-        public final static Property Sex = new Property(3, Integer.class, "Sex", false, "SEX");
-        public final static Property ClassCode = new Property(4, String.class, "ClassCode", false, "CLASS_CODE");
-        public final static Property GradeCode = new Property(5, String.class, "GradeCode", false, "GRADE_CODE");
-        public final static Property IDCardNo = new Property(6, String.class, "IDCardNo", false, "IDCARD_NO");
-        public final static Property ICCardNo = new Property(7, String.class, "ICCardNo", false, "ICCARD_NO");
-        public final static Property DownloadTime = new Property(8, String.class, "DownloadTime", false, "DOWNLOAD_TIME");
-        public final static Property Remark1 = new Property(9, String.class, "Remark1", false, "REMARK1");
-        public final static Property Remark2 = new Property(10, String.class, "Remark2", false, "REMARK2");
-        public final static Property Remark3 = new Property(11, String.class, "Remark3", false, "REMARK3");
+        public final static Property StudentCode = new Property(0, String.class, "StudentCode", true, "STUDENT_CODE");
+        public final static Property StudentName = new Property(1, String.class, "StudentName", false, "STUDENT_NAME");
+        public final static Property Sex = new Property(2, Integer.class, "Sex", false, "SEX");
+        public final static Property ClassCode = new Property(3, String.class, "ClassCode", false, "CLASS_CODE");
+        public final static Property GradeCode = new Property(4, String.class, "GradeCode", false, "GRADE_CODE");
+        public final static Property IDCardNo = new Property(5, String.class, "IDCardNo", false, "IDCARD_NO");
+        public final static Property ICCardNo = new Property(6, String.class, "ICCardNo", false, "ICCARD_NO");
+        public final static Property DownloadTime = new Property(7, String.class, "DownloadTime", false, "DOWNLOAD_TIME");
+        public final static Property Remark1 = new Property(8, String.class, "Remark1", false, "REMARK1");
+        public final static Property Remark2 = new Property(9, String.class, "Remark2", false, "REMARK2");
+        public final static Property Remark3 = new Property(10, String.class, "Remark3", false, "REMARK3");
     };
+
+    private DaoSession daoSession;
 
 
     public StudentDao(DaoConfig config) {
@@ -44,24 +45,24 @@ public class StudentDao extends AbstractDao<Student, Long> {
     
     public StudentDao(DaoConfig config, DaoSession daoSession) {
         super(config, daoSession);
+        this.daoSession = daoSession;
     }
 
     /** Creates the underlying database table. */
     public static void createTable(SQLiteDatabase db, boolean ifNotExists) {
         String constraint = ifNotExists? "IF NOT EXISTS ": "";
         db.execSQL("CREATE TABLE " + constraint + "'STUDENT' (" + //
-                "'STUDENT_ID' INTEGER PRIMARY KEY AUTOINCREMENT ," + // 0: StudentID
-                "'STUDENT_CODE' TEXT UNIQUE ," + // 1: StudentCode
-                "'STUDENT_NAME' TEXT," + // 2: StudentName
-                "'SEX' INTEGER," + // 3: Sex
-                "'CLASS_CODE' TEXT," + // 4: ClassCode
-                "'GRADE_CODE' TEXT," + // 5: GradeCode
-                "'IDCARD_NO' TEXT," + // 6: IDCardNo
-                "'ICCARD_NO' TEXT," + // 7: ICCardNo
-                "'DOWNLOAD_TIME' TEXT," + // 8: DownloadTime
-                "'REMARK1' TEXT," + // 9: Remark1
-                "'REMARK2' TEXT," + // 10: Remark2
-                "'REMARK3' TEXT);"); // 11: Remark3
+                "'STUDENT_CODE' TEXT PRIMARY KEY NOT NULL UNIQUE ," + // 0: StudentCode
+                "'STUDENT_NAME' TEXT," + // 1: StudentName
+                "'SEX' INTEGER," + // 2: Sex
+                "'CLASS_CODE' TEXT," + // 3: ClassCode
+                "'GRADE_CODE' TEXT," + // 4: GradeCode
+                "'IDCARD_NO' TEXT," + // 5: IDCardNo
+                "'ICCARD_NO' TEXT," + // 6: ICCardNo
+                "'DOWNLOAD_TIME' TEXT," + // 7: DownloadTime
+                "'REMARK1' TEXT," + // 8: Remark1
+                "'REMARK2' TEXT," + // 9: Remark2
+                "'REMARK3' TEXT);"); // 10: Remark3
     }
 
     /** Drops the underlying database table. */
@@ -75,89 +76,89 @@ public class StudentDao extends AbstractDao<Student, Long> {
     protected void bindValues(SQLiteStatement stmt, Student entity) {
         stmt.clearBindings();
  
-        Long StudentID = entity.getStudentID();
-        if (StudentID != null) {
-            stmt.bindLong(1, StudentID);
-        }
- 
         String StudentCode = entity.getStudentCode();
         if (StudentCode != null) {
-            stmt.bindString(2, StudentCode);
+            stmt.bindString(1, StudentCode);
         }
  
         String StudentName = entity.getStudentName();
         if (StudentName != null) {
-            stmt.bindString(3, StudentName);
+            stmt.bindString(2, StudentName);
         }
  
         Integer Sex = entity.getSex();
         if (Sex != null) {
-            stmt.bindLong(4, Sex);
+            stmt.bindLong(3, Sex);
         }
  
         String ClassCode = entity.getClassCode();
         if (ClassCode != null) {
-            stmt.bindString(5, ClassCode);
+            stmt.bindString(4, ClassCode);
         }
  
         String GradeCode = entity.getGradeCode();
         if (GradeCode != null) {
-            stmt.bindString(6, GradeCode);
+            stmt.bindString(5, GradeCode);
         }
  
         String IDCardNo = entity.getIDCardNo();
         if (IDCardNo != null) {
-            stmt.bindString(7, IDCardNo);
+            stmt.bindString(6, IDCardNo);
         }
  
         String ICCardNo = entity.getICCardNo();
         if (ICCardNo != null) {
-            stmt.bindString(8, ICCardNo);
+            stmt.bindString(7, ICCardNo);
         }
  
         String DownloadTime = entity.getDownloadTime();
         if (DownloadTime != null) {
-            stmt.bindString(9, DownloadTime);
+            stmt.bindString(8, DownloadTime);
         }
  
         String Remark1 = entity.getRemark1();
         if (Remark1 != null) {
-            stmt.bindString(10, Remark1);
+            stmt.bindString(9, Remark1);
         }
  
         String Remark2 = entity.getRemark2();
         if (Remark2 != null) {
-            stmt.bindString(11, Remark2);
+            stmt.bindString(10, Remark2);
         }
  
         String Remark3 = entity.getRemark3();
         if (Remark3 != null) {
-            stmt.bindString(12, Remark3);
+            stmt.bindString(11, Remark3);
         }
+    }
+
+    @Override
+    protected void attachEntity(Student entity) {
+        super.attachEntity(entity);
+        entity.__setDaoSession(daoSession);
     }
 
     /** @inheritdoc */
     @Override
-    public Long readKey(Cursor cursor, int offset) {
-        return cursor.isNull(offset + 0) ? null : cursor.getLong(offset + 0);
+    public String readKey(Cursor cursor, int offset) {
+        return cursor.isNull(offset + 0) ? null : cursor.getString(offset + 0);
     }    
 
     /** @inheritdoc */
     @Override
     public Student readEntity(Cursor cursor, int offset) {
         Student entity = new Student( //
-            cursor.isNull(offset + 0) ? null : cursor.getLong(offset + 0), // StudentID
-            cursor.isNull(offset + 1) ? null : cursor.getString(offset + 1), // StudentCode
-            cursor.isNull(offset + 2) ? null : cursor.getString(offset + 2), // StudentName
-            cursor.isNull(offset + 3) ? null : cursor.getInt(offset + 3), // Sex
-            cursor.isNull(offset + 4) ? null : cursor.getString(offset + 4), // ClassCode
-            cursor.isNull(offset + 5) ? null : cursor.getString(offset + 5), // GradeCode
-            cursor.isNull(offset + 6) ? null : cursor.getString(offset + 6), // IDCardNo
-            cursor.isNull(offset + 7) ? null : cursor.getString(offset + 7), // ICCardNo
-            cursor.isNull(offset + 8) ? null : cursor.getString(offset + 8), // DownloadTime
-            cursor.isNull(offset + 9) ? null : cursor.getString(offset + 9), // Remark1
-            cursor.isNull(offset + 10) ? null : cursor.getString(offset + 10), // Remark2
-            cursor.isNull(offset + 11) ? null : cursor.getString(offset + 11) // Remark3
+            cursor.isNull(offset + 0) ? null : cursor.getString(offset + 0), // StudentCode
+            cursor.isNull(offset + 1) ? null : cursor.getString(offset + 1), // StudentName
+            cursor.isNull(offset + 2) ? null : cursor.getInt(offset + 2), // Sex
+            cursor.isNull(offset + 3) ? null : cursor.getString(offset + 3), // ClassCode
+            cursor.isNull(offset + 4) ? null : cursor.getString(offset + 4), // GradeCode
+            cursor.isNull(offset + 5) ? null : cursor.getString(offset + 5), // IDCardNo
+            cursor.isNull(offset + 6) ? null : cursor.getString(offset + 6), // ICCardNo
+            cursor.isNull(offset + 7) ? null : cursor.getString(offset + 7), // DownloadTime
+            cursor.isNull(offset + 8) ? null : cursor.getString(offset + 8), // Remark1
+            cursor.isNull(offset + 9) ? null : cursor.getString(offset + 9), // Remark2
+            cursor.isNull(offset + 10) ? null : cursor.getString(offset + 10) // Remark3
         );
         return entity;
     }
@@ -165,32 +166,30 @@ public class StudentDao extends AbstractDao<Student, Long> {
     /** @inheritdoc */
     @Override
     public void readEntity(Cursor cursor, Student entity, int offset) {
-        entity.setStudentID(cursor.isNull(offset + 0) ? null : cursor.getLong(offset + 0));
-        entity.setStudentCode(cursor.isNull(offset + 1) ? null : cursor.getString(offset + 1));
-        entity.setStudentName(cursor.isNull(offset + 2) ? null : cursor.getString(offset + 2));
-        entity.setSex(cursor.isNull(offset + 3) ? null : cursor.getInt(offset + 3));
-        entity.setClassCode(cursor.isNull(offset + 4) ? null : cursor.getString(offset + 4));
-        entity.setGradeCode(cursor.isNull(offset + 5) ? null : cursor.getString(offset + 5));
-        entity.setIDCardNo(cursor.isNull(offset + 6) ? null : cursor.getString(offset + 6));
-        entity.setICCardNo(cursor.isNull(offset + 7) ? null : cursor.getString(offset + 7));
-        entity.setDownloadTime(cursor.isNull(offset + 8) ? null : cursor.getString(offset + 8));
-        entity.setRemark1(cursor.isNull(offset + 9) ? null : cursor.getString(offset + 9));
-        entity.setRemark2(cursor.isNull(offset + 10) ? null : cursor.getString(offset + 10));
-        entity.setRemark3(cursor.isNull(offset + 11) ? null : cursor.getString(offset + 11));
+        entity.setStudentCode(cursor.isNull(offset + 0) ? null : cursor.getString(offset + 0));
+        entity.setStudentName(cursor.isNull(offset + 1) ? null : cursor.getString(offset + 1));
+        entity.setSex(cursor.isNull(offset + 2) ? null : cursor.getInt(offset + 2));
+        entity.setClassCode(cursor.isNull(offset + 3) ? null : cursor.getString(offset + 3));
+        entity.setGradeCode(cursor.isNull(offset + 4) ? null : cursor.getString(offset + 4));
+        entity.setIDCardNo(cursor.isNull(offset + 5) ? null : cursor.getString(offset + 5));
+        entity.setICCardNo(cursor.isNull(offset + 6) ? null : cursor.getString(offset + 6));
+        entity.setDownloadTime(cursor.isNull(offset + 7) ? null : cursor.getString(offset + 7));
+        entity.setRemark1(cursor.isNull(offset + 8) ? null : cursor.getString(offset + 8));
+        entity.setRemark2(cursor.isNull(offset + 9) ? null : cursor.getString(offset + 9));
+        entity.setRemark3(cursor.isNull(offset + 10) ? null : cursor.getString(offset + 10));
      }
     
     /** @inheritdoc */
     @Override
-    protected Long updateKeyAfterInsert(Student entity, long rowId) {
-        entity.setStudentID(rowId);
-        return rowId;
+    protected String updateKeyAfterInsert(Student entity, long rowId) {
+        return entity.getStudentCode();
     }
     
     /** @inheritdoc */
     @Override
-    public Long getKey(Student entity) {
+    public String getKey(Student entity) {
         if(entity != null) {
-            return entity.getStudentID();
+            return entity.getStudentCode();
         } else {
             return null;
         }

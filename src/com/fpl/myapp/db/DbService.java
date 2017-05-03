@@ -38,14 +38,14 @@ public class DbService {
 			if (appContext == null) {
 				appContext = context.getApplicationContext();
 			}
-			instance.mDaoSession = GreenDaoHelper.getDaoSession(context);
-			instance.classesDao = instance.mDaoSession.getClassesDao();
-			instance.gradeDao = instance.mDaoSession.getGradeDao();
-			instance.itemDao = instance.mDaoSession.getItemDao();
-			instance.roundResultDao = instance.mDaoSession.getRoundResultDao();
-			instance.schoolDao = instance.mDaoSession.getSchoolDao();
-			instance.studentDao = instance.mDaoSession.getStudentDao();
-			instance.studentItemDao = instance.mDaoSession.getStudentItemDao();
+			DbService.mDaoSession = GreenDaoHelper.getDaoSession(context);
+			DbService.classesDao = DbService.mDaoSession.getClassesDao();
+			DbService.gradeDao = DbService.mDaoSession.getGradeDao();
+			DbService.itemDao = DbService.mDaoSession.getItemDao();
+			DbService.roundResultDao = DbService.mDaoSession.getRoundResultDao();
+			DbService.schoolDao = DbService.mDaoSession.getSchoolDao();
+			DbService.studentDao = DbService.mDaoSession.getStudentDao();
+			DbService.studentItemDao = DbService.mDaoSession.getStudentItemDao();
 		}
 		return instance;
 	}
@@ -105,40 +105,40 @@ public class DbService {
 		return roundResults;
 	}
 
-	public List<StudentItem> queryStudentItemByCode(String stuCode, String itemCode) {
+	public StudentItem queryStudentItemByCode(String stuCode, String itemCode) {
 		QueryBuilder<StudentItem> qb = studentItemDao.queryBuilder();
 		qb.where(qb.and(StudentItemDao.Properties.StudentCode.eq(stuCode),
 				StudentItemDao.Properties.ItemCode.eq(itemCode)));
-		return qb.list();
+		return qb.unique();
 	}
 
-	public Classes loadClasses(long id) {
-		return classesDao.load(id);
-	}
-
-	public Grade loadGrade(long id) {
-		return gradeDao.load(id);
-	}
-
-	public Item loadItem(long id) {
-		return itemDao.load(id);
-	}
-
-	public RoundResult loadRoundResult(long id) {
-		return roundResultDao.load(id);
-	}
-
-	public School loadSchool(long id) {
-		return schoolDao.load(id);
-	}
-
-	public Student loadStudent(long id) {
-		return studentDao.load(id);
-	}
-
-	public StudentItem loadStudentItem(long id) {
-		return studentItemDao.load(id);
-	}
+	// public Classes loadClasses(long id) {
+	// return classesDao.load(id);
+	// }
+	//
+	// public Grade loadGrade(long id) {
+	// return gradeDao.load(id);
+	// }
+	//
+	// public Item loadItem(long id) {
+	// return itemDao.load(id);
+	// }
+	//
+	// public RoundResult loadRoundResult(long id) {
+	// return roundResultDao.load(id);
+	// }
+	//
+	// public School loadSchool(long id) {
+	// return schoolDao.load(id);
+	// }
+	//
+	// public Student loadStudent(long id) {
+	// return studentDao.load(id);
+	// }
+	//
+	// public StudentItem loadStudentItem(long id) {
+	// return studentItemDao.load(id);
+	// }
 
 	// -----------------------------------
 	public List<Classes> loadAllClasses() {
@@ -370,33 +370,33 @@ public class DbService {
 	}
 
 	// ---------------------------------------
-	public void deleteClasses(long id) {
-		classesDao.deleteByKey(id);
-	}
-
-	public void deleteGrade(long id) {
-		gradeDao.deleteByKey(id);
-	}
-
-	public void deleteItem(long id) {
-		itemDao.deleteByKey(id);
-	}
-
-	public void deleteRoundResult(long id) {
-		roundResultDao.deleteByKey(id);
-	}
-
-	public void deleteSchool(long id) {
-		schoolDao.deleteByKey(id);
-	}
-
-	public void deleteStudent(long id) {
-		studentDao.deleteByKey(id);
-	}
-
-	public void deleteStudentItem(long id) {
-		studentItemDao.deleteByKey(id);
-	}
+	// public void deleteClasses(long id) {
+	// classesDao.deleteByKey(id);
+	// }
+	//
+	// public void deleteGrade(long id) {
+	// gradeDao.deleteByKey(id);
+	// }
+	//
+	// public void deleteItem(long id) {
+	// itemDao.deleteByKey(id);
+	// }
+	//
+	// public void deleteRoundResult(long id) {
+	// roundResultDao.deleteByKey(id);
+	// }
+	//
+	// public void deleteSchool(long id) {
+	// schoolDao.deleteByKey(id);
+	// }
+	//
+	// public void deleteStudent(long id) {
+	// studentDao.deleteByKey(id);
+	// }
+	//
+	// public void deleteStudentItem(long id) {
+	// studentItemDao.deleteByKey(id);
+	// }
 
 	// -----------------------------------------
 	public void deleteClasses(Classes classes) {
@@ -426,4 +426,5 @@ public class DbService {
 	public void deleteStudentItem(StudentItem studentItem) {
 		studentItemDao.delete(studentItem);
 	}
+
 }

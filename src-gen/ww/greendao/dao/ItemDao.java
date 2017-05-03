@@ -14,7 +14,7 @@ import ww.greendao.dao.Item;
 /** 
  * DAO for table ITEM.
 */
-public class ItemDao extends AbstractDao<Item, Long> {
+public class ItemDao extends AbstractDao<Item, String> {
 
     public static final String TABLENAME = "ITEM";
 
@@ -23,19 +23,20 @@ public class ItemDao extends AbstractDao<Item, Long> {
      * Can be used for QueryBuilder and for referencing column names.
     */
     public static class Properties {
-        public final static Property ItemID = new Property(0, Long.class, "ItemID", true, "ITEM_ID");
-        public final static Property ItemCode = new Property(1, String.class, "ItemCode", false, "ITEM_CODE");
-        public final static Property ItemName = new Property(2, String.class, "ItemName", false, "ITEM_NAME");
-        public final static Property MinValue = new Property(3, Integer.class, "MinValue", false, "MIN_VALUE");
-        public final static Property MaxValue = new Property(4, Integer.class, "MaxValue", false, "MAX_VALUE");
-        public final static Property Unit = new Property(5, String.class, "Unit", false, "UNIT");
-        public final static Property DataLen = new Property(6, Integer.class, "DataLen", false, "DATA_LEN");
-        public final static Property CarryMode = new Property(7, Integer.class, "CarryMode", false, "CARRY_MODE");
-        public final static Property ItemType = new Property(8, Integer.class, "ItemType", false, "ITEM_TYPE");
-        public final static Property MachineCode = new Property(9, String.class, "MachineCode", false, "MACHINE_CODE");
-        public final static Property IsEnable = new Property(10, Integer.class, "IsEnable", false, "IS_ENABLE");
-        public final static Property Remark1 = new Property(11, String.class, "Remark1", false, "REMARK1");
+        public final static Property ItemCode = new Property(0, String.class, "ItemCode", true, "ITEM_CODE");
+        public final static Property ItemName = new Property(1, String.class, "ItemName", false, "ITEM_NAME");
+        public final static Property MinValue = new Property(2, Integer.class, "MinValue", false, "MIN_VALUE");
+        public final static Property MaxValue = new Property(3, Integer.class, "MaxValue", false, "MAX_VALUE");
+        public final static Property Unit = new Property(4, String.class, "Unit", false, "UNIT");
+        public final static Property DataLen = new Property(5, Integer.class, "DataLen", false, "DATA_LEN");
+        public final static Property CarryMode = new Property(6, Integer.class, "CarryMode", false, "CARRY_MODE");
+        public final static Property ItemType = new Property(7, Integer.class, "ItemType", false, "ITEM_TYPE");
+        public final static Property MachineCode = new Property(8, String.class, "MachineCode", false, "MACHINE_CODE");
+        public final static Property IsEnable = new Property(9, Integer.class, "IsEnable", false, "IS_ENABLE");
+        public final static Property Remark1 = new Property(10, String.class, "Remark1", false, "REMARK1");
     };
+
+    private DaoSession daoSession;
 
 
     public ItemDao(DaoConfig config) {
@@ -44,24 +45,24 @@ public class ItemDao extends AbstractDao<Item, Long> {
     
     public ItemDao(DaoConfig config, DaoSession daoSession) {
         super(config, daoSession);
+        this.daoSession = daoSession;
     }
 
     /** Creates the underlying database table. */
     public static void createTable(SQLiteDatabase db, boolean ifNotExists) {
         String constraint = ifNotExists? "IF NOT EXISTS ": "";
         db.execSQL("CREATE TABLE " + constraint + "'ITEM' (" + //
-                "'ITEM_ID' INTEGER PRIMARY KEY AUTOINCREMENT ," + // 0: ItemID
-                "'ITEM_CODE' TEXT UNIQUE ," + // 1: ItemCode
-                "'ITEM_NAME' TEXT UNIQUE ," + // 2: ItemName
-                "'MIN_VALUE' INTEGER," + // 3: MinValue
-                "'MAX_VALUE' INTEGER," + // 4: MaxValue
-                "'UNIT' TEXT," + // 5: Unit
-                "'DATA_LEN' INTEGER," + // 6: DataLen
-                "'CARRY_MODE' INTEGER," + // 7: CarryMode
-                "'ITEM_TYPE' INTEGER," + // 8: ItemType
-                "'MACHINE_CODE' TEXT," + // 9: MachineCode
-                "'IS_ENABLE' INTEGER," + // 10: IsEnable
-                "'REMARK1' TEXT);"); // 11: Remark1
+                "'ITEM_CODE' TEXT PRIMARY KEY NOT NULL UNIQUE ," + // 0: ItemCode
+                "'ITEM_NAME' TEXT UNIQUE ," + // 1: ItemName
+                "'MIN_VALUE' INTEGER," + // 2: MinValue
+                "'MAX_VALUE' INTEGER," + // 3: MaxValue
+                "'UNIT' TEXT," + // 4: Unit
+                "'DATA_LEN' INTEGER," + // 5: DataLen
+                "'CARRY_MODE' INTEGER," + // 6: CarryMode
+                "'ITEM_TYPE' INTEGER," + // 7: ItemType
+                "'MACHINE_CODE' TEXT," + // 8: MachineCode
+                "'IS_ENABLE' INTEGER," + // 9: IsEnable
+                "'REMARK1' TEXT);"); // 10: Remark1
     }
 
     /** Drops the underlying database table. */
@@ -75,89 +76,89 @@ public class ItemDao extends AbstractDao<Item, Long> {
     protected void bindValues(SQLiteStatement stmt, Item entity) {
         stmt.clearBindings();
  
-        Long ItemID = entity.getItemID();
-        if (ItemID != null) {
-            stmt.bindLong(1, ItemID);
-        }
- 
         String ItemCode = entity.getItemCode();
         if (ItemCode != null) {
-            stmt.bindString(2, ItemCode);
+            stmt.bindString(1, ItemCode);
         }
  
         String ItemName = entity.getItemName();
         if (ItemName != null) {
-            stmt.bindString(3, ItemName);
+            stmt.bindString(2, ItemName);
         }
  
         Integer MinValue = entity.getMinValue();
         if (MinValue != null) {
-            stmt.bindLong(4, MinValue);
+            stmt.bindLong(3, MinValue);
         }
  
         Integer MaxValue = entity.getMaxValue();
         if (MaxValue != null) {
-            stmt.bindLong(5, MaxValue);
+            stmt.bindLong(4, MaxValue);
         }
  
         String Unit = entity.getUnit();
         if (Unit != null) {
-            stmt.bindString(6, Unit);
+            stmt.bindString(5, Unit);
         }
  
         Integer DataLen = entity.getDataLen();
         if (DataLen != null) {
-            stmt.bindLong(7, DataLen);
+            stmt.bindLong(6, DataLen);
         }
  
         Integer CarryMode = entity.getCarryMode();
         if (CarryMode != null) {
-            stmt.bindLong(8, CarryMode);
+            stmt.bindLong(7, CarryMode);
         }
  
         Integer ItemType = entity.getItemType();
         if (ItemType != null) {
-            stmt.bindLong(9, ItemType);
+            stmt.bindLong(8, ItemType);
         }
  
         String MachineCode = entity.getMachineCode();
         if (MachineCode != null) {
-            stmt.bindString(10, MachineCode);
+            stmt.bindString(9, MachineCode);
         }
  
         Integer IsEnable = entity.getIsEnable();
         if (IsEnable != null) {
-            stmt.bindLong(11, IsEnable);
+            stmt.bindLong(10, IsEnable);
         }
  
         String Remark1 = entity.getRemark1();
         if (Remark1 != null) {
-            stmt.bindString(12, Remark1);
+            stmt.bindString(11, Remark1);
         }
+    }
+
+    @Override
+    protected void attachEntity(Item entity) {
+        super.attachEntity(entity);
+        entity.__setDaoSession(daoSession);
     }
 
     /** @inheritdoc */
     @Override
-    public Long readKey(Cursor cursor, int offset) {
-        return cursor.isNull(offset + 0) ? null : cursor.getLong(offset + 0);
+    public String readKey(Cursor cursor, int offset) {
+        return cursor.isNull(offset + 0) ? null : cursor.getString(offset + 0);
     }    
 
     /** @inheritdoc */
     @Override
     public Item readEntity(Cursor cursor, int offset) {
         Item entity = new Item( //
-            cursor.isNull(offset + 0) ? null : cursor.getLong(offset + 0), // ItemID
-            cursor.isNull(offset + 1) ? null : cursor.getString(offset + 1), // ItemCode
-            cursor.isNull(offset + 2) ? null : cursor.getString(offset + 2), // ItemName
-            cursor.isNull(offset + 3) ? null : cursor.getInt(offset + 3), // MinValue
-            cursor.isNull(offset + 4) ? null : cursor.getInt(offset + 4), // MaxValue
-            cursor.isNull(offset + 5) ? null : cursor.getString(offset + 5), // Unit
-            cursor.isNull(offset + 6) ? null : cursor.getInt(offset + 6), // DataLen
-            cursor.isNull(offset + 7) ? null : cursor.getInt(offset + 7), // CarryMode
-            cursor.isNull(offset + 8) ? null : cursor.getInt(offset + 8), // ItemType
-            cursor.isNull(offset + 9) ? null : cursor.getString(offset + 9), // MachineCode
-            cursor.isNull(offset + 10) ? null : cursor.getInt(offset + 10), // IsEnable
-            cursor.isNull(offset + 11) ? null : cursor.getString(offset + 11) // Remark1
+            cursor.isNull(offset + 0) ? null : cursor.getString(offset + 0), // ItemCode
+            cursor.isNull(offset + 1) ? null : cursor.getString(offset + 1), // ItemName
+            cursor.isNull(offset + 2) ? null : cursor.getInt(offset + 2), // MinValue
+            cursor.isNull(offset + 3) ? null : cursor.getInt(offset + 3), // MaxValue
+            cursor.isNull(offset + 4) ? null : cursor.getString(offset + 4), // Unit
+            cursor.isNull(offset + 5) ? null : cursor.getInt(offset + 5), // DataLen
+            cursor.isNull(offset + 6) ? null : cursor.getInt(offset + 6), // CarryMode
+            cursor.isNull(offset + 7) ? null : cursor.getInt(offset + 7), // ItemType
+            cursor.isNull(offset + 8) ? null : cursor.getString(offset + 8), // MachineCode
+            cursor.isNull(offset + 9) ? null : cursor.getInt(offset + 9), // IsEnable
+            cursor.isNull(offset + 10) ? null : cursor.getString(offset + 10) // Remark1
         );
         return entity;
     }
@@ -165,32 +166,30 @@ public class ItemDao extends AbstractDao<Item, Long> {
     /** @inheritdoc */
     @Override
     public void readEntity(Cursor cursor, Item entity, int offset) {
-        entity.setItemID(cursor.isNull(offset + 0) ? null : cursor.getLong(offset + 0));
-        entity.setItemCode(cursor.isNull(offset + 1) ? null : cursor.getString(offset + 1));
-        entity.setItemName(cursor.isNull(offset + 2) ? null : cursor.getString(offset + 2));
-        entity.setMinValue(cursor.isNull(offset + 3) ? null : cursor.getInt(offset + 3));
-        entity.setMaxValue(cursor.isNull(offset + 4) ? null : cursor.getInt(offset + 4));
-        entity.setUnit(cursor.isNull(offset + 5) ? null : cursor.getString(offset + 5));
-        entity.setDataLen(cursor.isNull(offset + 6) ? null : cursor.getInt(offset + 6));
-        entity.setCarryMode(cursor.isNull(offset + 7) ? null : cursor.getInt(offset + 7));
-        entity.setItemType(cursor.isNull(offset + 8) ? null : cursor.getInt(offset + 8));
-        entity.setMachineCode(cursor.isNull(offset + 9) ? null : cursor.getString(offset + 9));
-        entity.setIsEnable(cursor.isNull(offset + 10) ? null : cursor.getInt(offset + 10));
-        entity.setRemark1(cursor.isNull(offset + 11) ? null : cursor.getString(offset + 11));
+        entity.setItemCode(cursor.isNull(offset + 0) ? null : cursor.getString(offset + 0));
+        entity.setItemName(cursor.isNull(offset + 1) ? null : cursor.getString(offset + 1));
+        entity.setMinValue(cursor.isNull(offset + 2) ? null : cursor.getInt(offset + 2));
+        entity.setMaxValue(cursor.isNull(offset + 3) ? null : cursor.getInt(offset + 3));
+        entity.setUnit(cursor.isNull(offset + 4) ? null : cursor.getString(offset + 4));
+        entity.setDataLen(cursor.isNull(offset + 5) ? null : cursor.getInt(offset + 5));
+        entity.setCarryMode(cursor.isNull(offset + 6) ? null : cursor.getInt(offset + 6));
+        entity.setItemType(cursor.isNull(offset + 7) ? null : cursor.getInt(offset + 7));
+        entity.setMachineCode(cursor.isNull(offset + 8) ? null : cursor.getString(offset + 8));
+        entity.setIsEnable(cursor.isNull(offset + 9) ? null : cursor.getInt(offset + 9));
+        entity.setRemark1(cursor.isNull(offset + 10) ? null : cursor.getString(offset + 10));
      }
     
     /** @inheritdoc */
     @Override
-    protected Long updateKeyAfterInsert(Item entity, long rowId) {
-        entity.setItemID(rowId);
-        return rowId;
+    protected String updateKeyAfterInsert(Item entity, long rowId) {
+        return entity.getItemCode();
     }
     
     /** @inheritdoc */
     @Override
-    public Long getKey(Item entity) {
+    public String getKey(Item entity) {
         if(entity != null) {
-            return entity.getItemID();
+            return entity.getItemCode();
         } else {
             return null;
         }

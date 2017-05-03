@@ -11,8 +11,10 @@ import de.greenrobot.dao.DaoException;
 public class StudentItem {
 
     private Long StudentItemID;
-    private String studentCode;
-    private String itemCode;
+    /** Not-null value. */
+    private String StudentCode;
+    /** Not-null value. */
+    private String ItemCode;
     private Integer lastResult;
     private Integer resultState;
     private String lastTestTime;
@@ -27,6 +29,12 @@ public class StudentItem {
     /** Used for active entity operations. */
     private transient StudentItemDao myDao;
 
+    private Student student;
+    private String student__resolvedKey;
+
+    private Item item;
+    private String item__resolvedKey;
+
     private List<RoundResult> roundResults;
 
     public StudentItem() {
@@ -36,10 +44,10 @@ public class StudentItem {
         this.StudentItemID = StudentItemID;
     }
 
-    public StudentItem(Long StudentItemID, String studentCode, String itemCode, Integer lastResult, Integer resultState, String lastTestTime, Integer TestState, String Remark1, String Remark2, String Remark3) {
+    public StudentItem(Long StudentItemID, String StudentCode, String ItemCode, Integer lastResult, Integer resultState, String lastTestTime, Integer TestState, String Remark1, String Remark2, String Remark3) {
         this.StudentItemID = StudentItemID;
-        this.studentCode = studentCode;
-        this.itemCode = itemCode;
+        this.StudentCode = StudentCode;
+        this.ItemCode = ItemCode;
         this.lastResult = lastResult;
         this.resultState = resultState;
         this.lastTestTime = lastTestTime;
@@ -63,20 +71,24 @@ public class StudentItem {
         this.StudentItemID = StudentItemID;
     }
 
+    /** Not-null value. */
     public String getStudentCode() {
-        return studentCode;
+        return StudentCode;
     }
 
-    public void setStudentCode(String studentCode) {
-        this.studentCode = studentCode;
+    /** Not-null value; ensure this value is available before it is saved to the database. */
+    public void setStudentCode(String StudentCode) {
+        this.StudentCode = StudentCode;
     }
 
+    /** Not-null value. */
     public String getItemCode() {
-        return itemCode;
+        return ItemCode;
     }
 
-    public void setItemCode(String itemCode) {
-        this.itemCode = itemCode;
+    /** Not-null value; ensure this value is available before it is saved to the database. */
+    public void setItemCode(String ItemCode) {
+        this.ItemCode = ItemCode;
     }
 
     public Integer getLastResult() {
@@ -133,6 +145,62 @@ public class StudentItem {
 
     public void setRemark3(String Remark3) {
         this.Remark3 = Remark3;
+    }
+
+    /** To-one relationship, resolved on first access. */
+    public Student getStudent() {
+        String __key = this.StudentCode;
+        if (student__resolvedKey == null || student__resolvedKey != __key) {
+            if (daoSession == null) {
+                throw new DaoException("Entity is detached from DAO context");
+            }
+            StudentDao targetDao = daoSession.getStudentDao();
+            Student studentNew = targetDao.load(__key);
+            synchronized (this) {
+                student = studentNew;
+            	student__resolvedKey = __key;
+            }
+        }
+        return student;
+    }
+
+    public void setStudent(Student student) {
+        if (student == null) {
+            throw new DaoException("To-one property 'StudentCode' has not-null constraint; cannot set to-one to null");
+        }
+        synchronized (this) {
+            this.student = student;
+            StudentCode = student.getStudentCode();
+            student__resolvedKey = StudentCode;
+        }
+    }
+
+    /** To-one relationship, resolved on first access. */
+    public Item getItem() {
+        String __key = this.ItemCode;
+        if (item__resolvedKey == null || item__resolvedKey != __key) {
+            if (daoSession == null) {
+                throw new DaoException("Entity is detached from DAO context");
+            }
+            ItemDao targetDao = daoSession.getItemDao();
+            Item itemNew = targetDao.load(__key);
+            synchronized (this) {
+                item = itemNew;
+            	item__resolvedKey = __key;
+            }
+        }
+        return item;
+    }
+
+    public void setItem(Item item) {
+        if (item == null) {
+            throw new DaoException("To-one property 'ItemCode' has not-null constraint; cannot set to-one to null");
+        }
+        synchronized (this) {
+            this.item = item;
+            ItemCode = item.getItemCode();
+            item__resolvedKey = ItemCode;
+        }
     }
 
     /** To-many relationship, resolved on first access (and after reset). Changes to to-many relations are not persisted, make changes to the target entity. */

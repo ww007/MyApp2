@@ -60,7 +60,7 @@ public class SitAndReachActivity extends NFCActivity {
 	private Context context;
 	private String max;
 	private String min;
-	private List<StudentItem> studentItems;
+	private StudentItem studentItems;
 	private Logger log = Logger.getLogger(SitAndReachActivity.class);
 	private RadioGroup rg;
 	private RadioButton rb0;
@@ -356,7 +356,7 @@ public class SitAndReachActivity extends NFCActivity {
 					studentItems = DbService.getInstance(context).queryStudentItemByCode(tvNumber.getText().toString(),
 							itemCode);
 
-					if (studentItems.isEmpty()) {
+					if (studentItems==null) {
 						Toast.makeText(context, "当前学生项目不存在", Toast.LENGTH_SHORT).show();
 						return;
 					} else {

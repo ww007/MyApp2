@@ -9,8 +9,8 @@ import de.greenrobot.dao.DaoException;
  */
 public class Classes {
 
-    private Long ClassID;
-    private long GradeID;
+    /** Not-null value. */
+    private String GradeCode;
     private String ClassCode;
     private String ClassName;
     private String Remark1;
@@ -22,19 +22,14 @@ public class Classes {
     private transient ClassesDao myDao;
 
     private Grade grade;
-    private Long grade__resolvedKey;
+    private String grade__resolvedKey;
 
 
     public Classes() {
     }
 
-    public Classes(Long ClassID) {
-        this.ClassID = ClassID;
-    }
-
-    public Classes(Long ClassID, long GradeID, String ClassCode, String ClassName, String Remark1) {
-        this.ClassID = ClassID;
-        this.GradeID = GradeID;
+    public Classes(String GradeCode, String ClassCode, String ClassName, String Remark1) {
+        this.GradeCode = GradeCode;
         this.ClassCode = ClassCode;
         this.ClassName = ClassName;
         this.Remark1 = Remark1;
@@ -46,20 +41,14 @@ public class Classes {
         myDao = daoSession != null ? daoSession.getClassesDao() : null;
     }
 
-    public Long getClassID() {
-        return ClassID;
+    /** Not-null value. */
+    public String getGradeCode() {
+        return GradeCode;
     }
 
-    public void setClassID(Long ClassID) {
-        this.ClassID = ClassID;
-    }
-
-    public long getGradeID() {
-        return GradeID;
-    }
-
-    public void setGradeID(long GradeID) {
-        this.GradeID = GradeID;
+    /** Not-null value; ensure this value is available before it is saved to the database. */
+    public void setGradeCode(String GradeCode) {
+        this.GradeCode = GradeCode;
     }
 
     public String getClassCode() {
@@ -88,8 +77,8 @@ public class Classes {
 
     /** To-one relationship, resolved on first access. */
     public Grade getGrade() {
-        long __key = this.GradeID;
-        if (grade__resolvedKey == null || !grade__resolvedKey.equals(__key)) {
+        String __key = this.GradeCode;
+        if (grade__resolvedKey == null || grade__resolvedKey != __key) {
             if (daoSession == null) {
                 throw new DaoException("Entity is detached from DAO context");
             }
@@ -105,12 +94,12 @@ public class Classes {
 
     public void setGrade(Grade grade) {
         if (grade == null) {
-            throw new DaoException("To-one property 'GradeID' has not-null constraint; cannot set to-one to null");
+            throw new DaoException("To-one property 'GradeCode' has not-null constraint; cannot set to-one to null");
         }
         synchronized (this) {
             this.grade = grade;
-            GradeID = grade.getGradeID();
-            grade__resolvedKey = GradeID;
+            GradeCode = grade.getGradeCode();
+            grade__resolvedKey = GradeCode;
         }
     }
 

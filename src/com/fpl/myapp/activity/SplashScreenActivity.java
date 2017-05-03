@@ -1,6 +1,9 @@
 package com.fpl.myapp.activity;
 
 import com.fpl.myapp2.R;
+
+import org.apache.http.protocol.HTTP;
+
 import com.fpl.myapp.db.DbService;
 import com.fpl.myapp.db.GreenDaoHelper;
 import com.fpl.myapp.util.HttpUtil;
@@ -24,25 +27,6 @@ public class SplashScreenActivity extends Activity {
 	private int SPLASH_TIME_OUT = 2000;
 	private Handler mHandle = new Handler();;
 	private Context context;
-	Runnable getItem = new Runnable() {
-		@Override
-		public void run() {
-			HttpUtil.getItemInfo(context);
-		}
-	};
-
-	Runnable getstuInfo = new Runnable() {
-		@Override
-		public void run() {
-			HttpUtil.getStudentInfo(context);
-		}
-	};
-	Runnable getstuItem = new Runnable() {
-		@Override
-		public void run() {
-			HttpUtil.getStudentItemInfo(context);
-		}
-	};
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -58,16 +42,12 @@ public class SplashScreenActivity extends Activity {
 
 	private void isWifiConnected(boolean result) {
 		if (true == result) {
-			if (DbService.getInstance(context).loadAllStudentItem().isEmpty()) {
-
-//				mHandle.post(getItem);
-//				mHandle.post(getstuInfo);
-//				mHandle.post(getstuItem);
-				HttpUtil.getStudentItemInfo(context);
+			if (DbService.getInstance(context).loadAllItem().isEmpty()) {
+				HttpUtil.getItemInfo(context);
 				if (HttpUtil.okFlag == 3000) {
 					SPLASH_TIME_OUT = 2000;
 				} else {
-					SPLASH_TIME_OUT = 20000;
+					SPLASH_TIME_OUT = 30000;
 				}
 			} else {
 				SPLASH_TIME_OUT = 2000;

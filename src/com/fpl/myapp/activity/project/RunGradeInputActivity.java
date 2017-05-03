@@ -331,7 +331,7 @@ public class RunGradeInputActivity extends NFCActivity {
 	private String checkedBtn = "正常";
 	private int resultState;
 	private String chengji;
-	private List<StudentItem> studentItems;
+	private StudentItem studentItems;
 	private Long stuId;
 
 	@Override
@@ -503,7 +503,7 @@ public class RunGradeInputActivity extends NFCActivity {
 							.getItemCode();
 					studentItems = DbService.getInstance(context).queryStudentItemByCode(tvNumber.getText().toString(),
 							itemCode);
-					if (studentItems.isEmpty()) {
+					if (studentItems==null) {
 						Toast.makeText(context, "当前学生项目不存在", Toast.LENGTH_SHORT).show();
 						return;
 					} else {
@@ -525,7 +525,7 @@ public class RunGradeInputActivity extends NFCActivity {
 					// 查询数据库中保存的该学生项目成绩的轮次
 					studentItems = DbService.getInstance(context).queryStudentItemByCode(tvNumber.getText().toString(),
 							itemCode);
-					if (studentItems.isEmpty()) {
+					if (studentItems==null) {
 						Toast.makeText(context, "当前学生项目不存在", Toast.LENGTH_SHORT).show();
 						return;
 					} else {
@@ -540,7 +540,7 @@ public class RunGradeInputActivity extends NFCActivity {
 							.get(0).getItemCode();
 					studentItems = DbService.getInstance(context).queryStudentItemByCode(tvNumber.getText().toString(),
 							itemCode);
-					if (studentItems.isEmpty()) {
+					if (studentItems==null) {
 						Toast.makeText(context, "当前学生项目不存在", Toast.LENGTH_SHORT).show();
 						return;
 					} else {
