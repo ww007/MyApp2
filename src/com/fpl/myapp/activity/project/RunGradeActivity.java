@@ -7,6 +7,7 @@ import org.apache.log4j.Logger;
 import com.fpl.myapp2.R;
 import com.fpl.myapp.adapter.ChengjiAdapter;
 import com.fpl.myapp.base.NFCActivity;
+import com.fpl.myapp.db.DbService;
 import com.fpl.myapp.db.SaveDBUtil;
 import com.fpl.myapp.entity.RunGrade;
 import com.fpl.myapp.util.Constant;
@@ -30,7 +31,6 @@ import android.widget.AdapterView.OnItemClickListener;
 import android.widget.Button;
 import android.widget.ListView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 public class RunGradeActivity extends NFCActivity {
 
@@ -131,14 +131,6 @@ public class RunGradeActivity extends NFCActivity {
 				IC_ItemResult ItemResultMiddleRace = new IC_ItemResult(Constant.MIDDLE_RACE, 0, 0, resultMiddleRace);
 				boolean isMiddleRaceResult = itemService.IC_WriteItemResult(ItemResultMiddleRace);
 				log.info("800/1000米跑写卡=>" + isMiddleRaceResult);
-				// String code;
-				// if (student.getSex() == 1) {
-				// code = "1000米跑";
-				// } else {
-				// code = "800米跑";
-				// }
-				// SaveDBUtil.saveGradesDB(context, student.getStuCode(),
-				// result1 + "", 0, "12", code);
 			} else if (title.equals("50米x8往返跑")) {
 				IItemService itemService = new NFCItemServiceImpl(intent);
 				String time = runGrades.get(currentPosition).getTime();
@@ -190,6 +182,10 @@ public class RunGradeActivity extends NFCActivity {
 							@Override
 							public void onClick(DialogInterface dialog, int which) {
 								datas = ChengjiAdapter.datas;
+								if (DbService.getInstance(context).loadAllItem().isEmpty()) {
+									NetUtil.showToast(context, "相关数据未下载，不能保存");
+									return;
+								}
 								if (title.equals("50米跑")) {
 									for (RunGrade runGrade : datas) {
 										if (!runGrade.getName().isEmpty()) {

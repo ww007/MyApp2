@@ -471,7 +471,7 @@ public class RunGradeInputActivity extends NFCActivity {
 
 			@Override
 			public void onClick(View v) {
-				if (DbService.getInstance(context).loadAllStudentItem().isEmpty()) {
+				if (DbService.getInstance(context).loadAllItem().isEmpty()) {
 					Toast.makeText(context, "请先获取项目相关数据", Toast.LENGTH_SHORT).show();
 					return;
 				}
@@ -503,7 +503,7 @@ public class RunGradeInputActivity extends NFCActivity {
 							.getItemCode();
 					studentItems = DbService.getInstance(context).queryStudentItemByCode(tvNumber.getText().toString(),
 							itemCode);
-					if (studentItems==null) {
+					if (studentItems == null) {
 						Toast.makeText(context, "当前学生项目不存在", Toast.LENGTH_SHORT).show();
 						return;
 					} else {
@@ -525,7 +525,7 @@ public class RunGradeInputActivity extends NFCActivity {
 					// 查询数据库中保存的该学生项目成绩的轮次
 					studentItems = DbService.getInstance(context).queryStudentItemByCode(tvNumber.getText().toString(),
 							itemCode);
-					if (studentItems==null) {
+					if (studentItems == null) {
 						Toast.makeText(context, "当前学生项目不存在", Toast.LENGTH_SHORT).show();
 						return;
 					} else {
@@ -540,7 +540,7 @@ public class RunGradeInputActivity extends NFCActivity {
 							.get(0).getItemCode();
 					studentItems = DbService.getInstance(context).queryStudentItemByCode(tvNumber.getText().toString(),
 							itemCode);
-					if (studentItems==null) {
+					if (studentItems == null) {
 						Toast.makeText(context, "当前学生项目不存在", Toast.LENGTH_SHORT).show();
 						return;
 					} else {

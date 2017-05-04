@@ -92,6 +92,7 @@ public class OnlineActivity extends Activity {
 		// 获取Android机IMEI号
 		TelephonyManager tm = (TelephonyManager) this.getSystemService(TELEPHONY_SERVICE);
 		MACID = tm.getDeviceId();
+		Log.i("IMEI=", MACID);
 
 		MACORIMEI = MACID;
 
@@ -296,6 +297,7 @@ public class OnlineActivity extends Activity {
 				for (RoundResult roundResult : roundResults) {
 					count++;
 					try {
+						Log.i("MACORIMEI=", MACORIMEI);
 						String stuCode = roundResult.getStudentItem().getStudentCode();
 						String itemCode = roundResult.getStudentItem().getItemCode();
 						RequestBody body = new FormBody.Builder().add("studentCode", stuCode).add("itemCode", itemCode)
@@ -313,11 +315,14 @@ public class OnlineActivity extends Activity {
 						paramsValue.put("resultState", roundResult.getResultState().toString());
 						paramsValue.put("isLastResult", roundResult.getIsLastResult().toString());
 						paramsValue.put("mac", MACORIMEI);
-
+						Log.i("studentCode", stuCode);
+						Log.i("itemCode", itemCode);
+						Log.i("result", roundResult.getResult().toString());
 						// 创建一个请求对象
 						String url = "http://" + ip + ":" + number + Constant.ROUND_RESULT_SAVE_URL;
 						Request request = new Request.Builder()
 								.url(url + "?signature=" + HttpUtil.getSignatureVal(paramsValue)).post(body).build();
+						Log.i("url", url + "?signature=" + HttpUtil.getSignatureVal(paramsValue));
 						// 发送请求获取响应
 						Response response = okHttpClient.newCall(request).execute();
 						// 判断请求是否成功

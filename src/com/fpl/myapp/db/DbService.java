@@ -112,6 +112,12 @@ public class DbService {
 		return qb.unique();
 	}
 
+	public List<StudentItem> queryStudentItemByStuCode(String stuCode) {
+		QueryBuilder<StudentItem> qb = studentItemDao.queryBuilder();
+		List<StudentItem> studentItems = qb.where(StudentItemDao.Properties.StudentCode.eq(stuCode)).list();
+		return studentItems;
+	}
+
 	// public Classes loadClasses(long id) {
 	// return classesDao.load(id);
 	// }

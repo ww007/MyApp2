@@ -62,7 +62,6 @@ public class InfraredBallActivity extends NFCActivity {
 	private String max;
 	private String min;
 	private StudentItem studentItems;
-	private List<RoundResult> roundResults;
 	private Logger log = Logger.getLogger(InfraredBallActivity.class);
 	private RadioGroup rg;
 	private RadioButton rb0;
@@ -331,7 +330,7 @@ public class InfraredBallActivity extends NFCActivity {
 
 			@Override
 			public void onClick(View v) {
-				if (DbService.getInstance(context).loadAllStudentItem().isEmpty()) {
+				if (DbService.getInstance(context).loadAllItem().isEmpty()) {
 					Toast.makeText(context, "请先获取项目相关数据", Toast.LENGTH_SHORT).show();
 					return;
 				}
@@ -358,7 +357,7 @@ public class InfraredBallActivity extends NFCActivity {
 					studentItems = DbService.getInstance(context).queryStudentItemByCode(tvNumber.getText().toString(),
 							itemCode);
 
-					if (studentItems==null) {
+					if (studentItems == null) {
 						Toast.makeText(context, "当前学生项目不存在", Toast.LENGTH_SHORT).show();
 						return;
 					} else {

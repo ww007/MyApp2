@@ -25,6 +25,7 @@ import android.os.Bundle;
 import android.text.Editable;
 import android.text.InputType;
 import android.text.TextWatcher;
+import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -334,7 +335,7 @@ public class HeightAndWeightActivity extends NFCActivity {
 
 			@Override
 			public void onClick(View v) {
-				if (DbService.getInstance(context).loadAllStudentItem().isEmpty()) {
+				if (DbService.getInstance(context).loadAllItem().isEmpty()) {
 					Toast.makeText(context, "请先获取项目相关数据", Toast.LENGTH_SHORT).show();
 					return;
 				}
@@ -352,7 +353,7 @@ public class HeightAndWeightActivity extends NFCActivity {
 					}
 					studentItems = DbService.getInstance(context).queryStudentItemByCode(tvNumber.getText().toString(),
 							"E01");
-					if (studentItems==null) {
+					if (studentItems == null) {
 						Toast.makeText(context, "当前学生项目不存在", Toast.LENGTH_SHORT).show();
 					} else {
 						int hResult = (int) (Double.parseDouble(etHeight.getText().toString()) * 10);

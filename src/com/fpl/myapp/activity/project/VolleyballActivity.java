@@ -328,7 +328,7 @@ public class VolleyballActivity extends NFCActivity {
 		btnSave.setOnClickListener(new OnClickListener() {
 			@Override
 			public void onClick(View v) {
-				if (DbService.getInstance(context).loadAllStudentItem().isEmpty()) {
+				if (DbService.getInstance(context).loadAllItem().isEmpty()) {
 					Toast.makeText(context, "请先获取项目相关数据", Toast.LENGTH_SHORT).show();
 					return;
 				}

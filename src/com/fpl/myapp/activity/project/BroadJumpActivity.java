@@ -91,7 +91,6 @@ public class BroadJumpActivity extends NFCActivity {
 			}
 		}
 		List<Item> items = DbService.getInstance(context).queryItemByName("立定跳远");
-
 		if (items.isEmpty()) {
 			max = "";
 			min = "";
@@ -102,7 +101,6 @@ public class BroadJumpActivity extends NFCActivity {
 
 		initView();
 		setListener();
-
 	}
 
 	@Override
@@ -338,7 +336,7 @@ public class BroadJumpActivity extends NFCActivity {
 
 			@Override
 			public void onClick(View v) {
-				if (DbService.getInstance(context).loadAllStudentItem().isEmpty()) {
+				if (DbService.getInstance(context).loadAllItem().isEmpty()) {
 					Toast.makeText(context, "请先获取项目相关数据", Toast.LENGTH_SHORT).show();
 					return;
 				}
@@ -359,10 +357,9 @@ public class BroadJumpActivity extends NFCActivity {
 						return;
 					}
 					grade = etChengji.getText().toString();
-//					studentItems=DbService.getInstance(context).queryStudentItemByID(stuID, itemID);
 					studentItems = DbService.getInstance(context).queryStudentItemByCode(tvNumber.getText().toString(),
 							"E09");
-					if (studentItems==null) {
+					if (studentItems == null) {
 						Toast.makeText(context, "当前学生项目不存在", Toast.LENGTH_SHORT).show();
 						return;
 					} else {
@@ -441,5 +438,4 @@ public class BroadJumpActivity extends NFCActivity {
 			}
 		});
 	}
-
 }
