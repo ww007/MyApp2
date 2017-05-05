@@ -12,6 +12,7 @@ import com.fpl.myapp.activity.manage.SystemManagementActivity;
 import com.fpl.myapp.activity.online.OnlineActivity;
 import com.fpl.myapp.activity.project.ProjectSelectionActivity;
 import com.fpl.myapp.base.NFCActivity;
+import com.fpl.myapp.db.DbService;
 import com.wnb.android.nfc.dataobject.entity.ItemProperty;
 import com.wnb.android.nfc.dataobject.entity.Student;
 import com.wnb.android.nfc.dataobject.service.IItemService;
@@ -21,13 +22,16 @@ import android.app.Activity;
 import android.app.Instrumentation;
 import android.content.Intent;
 import android.os.Bundle;
+import android.telephony.TelephonyManager;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.GridView;
 import android.widget.SimpleAdapter;
+import ww.greendao.dao.RoundResult;
 import android.widget.AdapterView.OnItemClickListener;
+import de.greenrobot.dao.async.AsyncSession;
 
 public class MainActivity extends NFCActivity {
 	private int[] icon = { R.drawable.main_projects_selector, R.drawable.main_online_selector,
@@ -37,6 +41,7 @@ public class MainActivity extends NFCActivity {
 	private GridView gvMain;
 	private ArrayList<Map<String, Object>> dataList;
 	private SimpleAdapter simAdapter;
+//	private static AsyncSession mAsyncSession = DbService.mDaoSession.startAsyncSession();
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -45,13 +50,39 @@ public class MainActivity extends NFCActivity {
 
 		initView();
 		setListeners();
-
+		// 获取Android机IMEI号
+		TelephonyManager tm = (TelephonyManager) this.getSystemService(TELEPHONY_SERVICE);
+		final String IMEI = tm.getDeviceId();
+//		DbService.getInstance(this).deleteAllRoundResult();
+//
+//		final List<RoundResult> list = new ArrayList<>();
+//		RoundResult result = new RoundResult();
+//		for (int i = 0; i < 160000; i++) {
+//			result.setMac(IMEI);
+//			result.setIsLastResult(0);
+//			result.setRemark1(null);
+//			result.setRemark2(null);
+//			result.setResult(i);
+//			result.setResultState(0);
+//			result.setRoundNo(1);
+//			result.setRoundResultID(null);
+//			result.setStudentItemID(i + 1);
+//			result.setTestTime("2017-05-05 09:40:35");
+//			list.add(result);
+//		}
+//		mAsyncSession.runInTx(new Runnable() {
+//			@Override
+//			public void run() {
+//				DbService.roundResultDao.insertOrReplaceInTx(list);
+//				Log.i("----------", list.size() + "保存完成");
+//			}
+//		});
 	}
 
-//	@Override
-//	public void onNewIntent(Intent intent) {
-//		initICCard(intent);
-//	}
+	// @Override
+	// public void onNewIntent(Intent intent) {
+	// initICCard(intent);
+	// }
 
 	/**
 	 * 初始化IC卡

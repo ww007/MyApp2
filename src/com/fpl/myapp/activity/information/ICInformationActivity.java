@@ -13,6 +13,7 @@ import com.fpl.myapp.db.DbService;
 import com.fpl.myapp.entity.ICInfo;
 import com.fpl.myapp.util.Constant;
 import com.wnb.android.nfc.dataobject.entity.IC_ItemResult;
+import com.wnb.android.nfc.dataobject.entity.ItemProperty;
 import com.wnb.android.nfc.dataobject.entity.Student;
 import com.wnb.android.nfc.dataobject.service.IItemService;
 import com.wnb.android.nfc.dataobject.service.impl.NFCItemServiceImpl;
@@ -95,6 +96,8 @@ public class ICInformationActivity extends NFCActivity {
 		try {
 			icInfos.clear();
 			itemService = new NFCItemServiceImpl(intent);
+			List<ItemProperty> properties = itemService.IC_ReadAllProperties();
+			Log.i("properties==", properties.toString());
 			Student student = itemService.IC_ReadStuInfo();
 			Log.i("StudentTest===", student.toString());
 			if (1 == student.getSex()) {
@@ -106,29 +109,77 @@ public class ICInformationActivity extends NFCActivity {
 			tvGender.setText(sex);
 			tvName.setText(student.getStuName().toString());
 			tvNumber.setText(student.getStuCode().toString());
+			for (ItemProperty itemProperty : properties) {
+				int itemCode = itemProperty.getItemCode();
+				switch (itemCode) {
+				case 1:
+					readHW(itemService);
+					break;
+				case 2:
+					readCommon(itemService, Constant.VITAL_CAPACITY, "ml", "肺活量");
+					break;
+				case 3:
+					readCommon(itemService, Constant.BROAD_JUMP, "cm", "立定跳远");
+					break;
+				case 4:
+					readCommon(itemService, Constant.JUMP_HEIGHT, "cm", "摸高");
+					break;
+				case 5:
+					readCommon(itemService, Constant.PUSH_UP, "个", "俯卧撑");
+					break;
+				case 6:
+					readCommon(itemService, Constant.SIT_UP, "个", "仰卧起坐");
+					break;
+				case 7:
+					readCommon(itemService, Constant.SIT_AND_REACH, "mm", "坐位体前屈");
+					break;
+				case 8:
+					readCommon(itemService, Constant.ROPE_SKIPPING, "个", "跳绳");
+					break;
+				case 9:
+					readVision(itemService);
+					break;
+				case 10:
+					readCommon(itemService, Constant.PULL_UP, "个", "引体向上");
+					break;
+				case 11:
+					readCommon(itemService, Constant.INFRARED_BALL, "cm", "实心球");
+					break;
+				case 12:
+					readMiddleRun(itemService);
+					break;
+				case 13:
+					readCommon(itemService, Constant.VOLLEYBALL, "ms", "排球");
+					break;
+				case 14:
+					readCommon(itemService, Constant.BASKETBALL_SKILL, "ms", "篮球运球");
+					break;
+				case 15:
+					readCommon(itemService, Constant.SHUTTLE_RUN, "ms", "折返跑");
+					break;
+				case 16:
+					readCommon(itemService, Constant.WALKING1500, "ms", "1500米健步走");
+					break;
+				case 17:
+					readCommon(itemService, Constant.WALKING2000, "ms", "2000米健步走");
+					break;
+				case 18:
+					readCommon(itemService, Constant.RUN50, "ms", "50米跑");
+					break;
+				case 19:
+					readCommon(itemService, Constant.FOOTBALL_SKILL, "ms", "足球运球");
+					break;
+				case 20:
+					readCommon(itemService, Constant.KICKING_SHUTTLECOCK, "个", "踢毽子");
+					break;
+				case 21:
+					readCommon(itemService, Constant.SWIM, "ms", "游泳");
+					break;
 
-			readHW(itemService);
-			readMiddleRun(itemService);
-			readVision(itemService);
-			readCommon(itemService, Constant.BASKETBALL_SKILL, "ms", "篮球运球");
-			readCommon(itemService, Constant.BROAD_JUMP, "cm", "立定跳远");
-			readCommon(itemService, Constant.FOOTBALL_SKILL, "ms", "足球运球");
-			readCommon(itemService, Constant.INFRARED_BALL, "cm", "实心球");
-			readCommon(itemService, Constant.JUMP_HEIGHT, "cm", "摸高");
-			readCommon(itemService, Constant.KICKING_SHUTTLECOCK, "个", "踢毽子");
-			readCommon(itemService, Constant.PULL_UP, "个", "引体向上");
-			readCommon(itemService, Constant.PUSH_UP, "个", "俯卧撑");
-			readCommon(itemService, Constant.ROPE_SKIPPING, "个", "跳绳");
-			readCommon(itemService, Constant.RUN50, "ms", "50米跑");
-			readCommon(itemService, Constant.SHUTTLE_RUN, "ms", "折返跑");
-			readCommon(itemService, Constant.SIT_AND_REACH, "mm", "坐位体前屈");
-			readCommon(itemService, Constant.SIT_UP, "个", "仰卧起坐");
-			readCommon(itemService, Constant.SWIM, "ms", "游泳");
-			readCommon(itemService, Constant.VITAL_CAPACITY, "ml", "肺活量");
-			readCommon(itemService, Constant.VOLLEYBALL, "ms", "排球");
-			readCommon(itemService, Constant.WALKING1500, "ms", "1500米健步走");
-			readCommon(itemService, Constant.WALKING2000, "ms", "2000米健步走");
-
+				default:
+					break;
+				}
+			}
 			updateView();
 
 		} catch (Exception e) {
@@ -240,7 +291,7 @@ public class ICInformationActivity extends NFCActivity {
 	 */
 	private void readHW(IItemService itemService) {
 		// 读取身高体重
-		
+
 		IC_ItemResult itemResultHW;
 		ICInfo icInfo = new ICInfo();
 		try {
@@ -264,7 +315,7 @@ public class ICInformationActivity extends NFCActivity {
 		}
 
 	}
-	
+
 	private void initView() {
 		tvShow = (TextView) findViewById(R.id.tv_icinfo_show);
 		lvIcInfo = (ListView) findViewById(R.id.lv_icinfo);

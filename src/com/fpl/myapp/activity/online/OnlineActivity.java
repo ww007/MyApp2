@@ -7,6 +7,7 @@ import java.util.Map;
 import org.apache.log4j.Logger;
 
 import com.fpl.myapp2.R;
+import com.squareup.leakcanary.watcher.R.string;
 import com.fpl.myapp.db.DbService;
 import com.fpl.myapp.ui.ArcProgressBar;
 import com.fpl.myapp.util.Constant;
@@ -31,11 +32,13 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.Toast;
 import okhttp3.FormBody;
+import okhttp3.HttpUrl;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.RequestBody;
 import okhttp3.Response;
 import ww.greendao.dao.RoundResult;
+import ww.greendao.dao.StudentItem;
 
 public class OnlineActivity extends Activity {
 
@@ -273,7 +276,7 @@ public class OnlineActivity extends Activity {
 			if (roundResults.isEmpty()) {
 				NetUtil.showToast(context, "上传数据为空");
 			} else {
-				postRoundResults(context, roundResults);
+				postRoundResults(context, roundResults, 0);
 			}
 		} else {
 			NetUtil.checkNetwork(OnlineActivity.this);
@@ -281,12 +284,80 @@ public class OnlineActivity extends Activity {
 
 	}
 
+	private long time1;
+	private long time2;
+	private long useTime;
+
+	private void postRoundResults(final Context context, final List<RoundResult> roundResults, final int i) {
+		new Thread() {
+			public void run() {
+				try {
+					int flagNo = i;
+					OkHttpClient okHttpClient = new OkHttpClient();
+					StringBuffer stringBuffer = new StringBuffer();
+					String stuCode = roundResults.get(i).getStudentItem().getStudentCode();
+					String itemCode = roundResults.get(i).getStudentItem().getItemCode();
+					String result = roundResults.get(i).getResult().toString();
+					String round = roundResults.get(i).getRoundNo().toString();
+					String time = roundResults.get(i).getTestTime();
+					String state = roundResults.get(i).getResultState().toString();
+
+					stringBuffer.append("&studentCode=").append(stuCode);
+					stringBuffer.append("&itemCode=").append(itemCode);
+					stringBuffer.append("&result=").append(result);
+					stringBuffer.append("&roundNo=").append(round);
+					stringBuffer.append("&testTime=").append(time);
+					stringBuffer.append("&resultState=").append(state);
+					stringBuffer.append("&isLastResult=").append("0");
+					stringBuffer.append("&mac=").append(MACORIMEI);
+
+					paramsValue.put("studentCode", stuCode);
+					paramsValue.put("itemCode", itemCode);
+					paramsValue.put("result", result);
+					paramsValue.put("roundNo", round);
+					paramsValue.put("testTime", time);
+					paramsValue.put("resultState", state);
+					paramsValue.put("isLastResult", "0");
+					paramsValue.put("mac", MACORIMEI);
+					String url = "http://" + ip + ":" + number + Constant.ROUND_RESULT_SAVE_URL;
+					Request request = new Request.Builder()
+							.url(url + "?signature=" + HttpUtil.getSignatureVal(paramsValue) + stringBuffer.toString())
+							.post(RequestBody.create(null, "")).build();
+
+					Response response = okHttpClient.newCall(request).execute();
+					// 判断请求是否成功
+					if (response.isSuccessful()) {
+						// 打印服务端返回结果
+						Log.i("--->", response.body().string());
+						if (i == 0) {
+							time1 = System.currentTimeMillis();
+						} else if (i == roundResults.size()) {
+							time2 = System.currentTimeMillis();
+							useTime = time2 - time1;
+							Log.i("上传用时：", useTime + "");
+							return;
+						}
+						flagNo++;
+						Log.i("flagNo----------", flagNo + "");
+						postRoundResults(context, roundResults, flagNo);
+					} else {
+						handler.sendEmptyMessage(3);
+					}
+				} catch (IOException e) {
+					e.printStackTrace();
+					Log.e("----", "上传出错");
+					handler.sendEmptyMessage(3);
+				}
+			};
+		}.start();
+	}
+
 	private Map<String, String> paramsValue = new HashMap<>();
 	private int count = 0;
 	private int errorCount = 0;
 	private int hasCount = 0;
 
-	private void postRoundResults(final Context context, final List<RoundResult> roundResults) {
+	private void postRoundResults1(final Context context, final List<RoundResult> roundResults) {
 		new Thread() {
 
 			@Override
@@ -304,25 +375,37 @@ public class OnlineActivity extends Activity {
 								.add("result", roundResult.getResult().toString())
 								.add("roundNo", roundResult.getRoundNo().toString())
 								.add("testTime", roundResult.getTestTime())
-								.add("resultState", roundResult.getResultState().toString())
-								.add("isLastResult", roundResult.getIsLastResult().toString()).add("mac", MACORIMEI)
-								.build();
+								.add("resultState", roundResult.getResultState().toString()).add("isLastResult", "0")
+								.add("mac", MACORIMEI).build();
+						StringBuffer stringBuffer = new StringBuffer();
+						stringBuffer.append("&studentCode=").append(stuCode);
+						stringBuffer.append("&itemCode=").append(itemCode);
+						stringBuffer.append("&result=").append(roundResult.getResult().toString());
+						stringBuffer.append("&roundNo=").append(roundResult.getRoundNo().toString());
+						stringBuffer.append("&testTime=").append(roundResult.getTestTime());
+						stringBuffer.append("&resultState=").append(roundResult.getResultState().toString());
+						stringBuffer.append("&isLastResult=").append("0");
+						stringBuffer.append("&mac=").append(MACORIMEI);
+
+						Log.i("stringBuffer=", stringBuffer.toString());
 						paramsValue.put("studentCode", stuCode);
 						paramsValue.put("itemCode", itemCode);
 						paramsValue.put("result", roundResult.getResult().toString());
 						paramsValue.put("roundNo", roundResult.getRoundNo().toString());
 						paramsValue.put("testTime", roundResult.getTestTime());
 						paramsValue.put("resultState", roundResult.getResultState().toString());
-						paramsValue.put("isLastResult", roundResult.getIsLastResult().toString());
+						paramsValue.put("isLastResult", "0");
 						paramsValue.put("mac", MACORIMEI);
 						Log.i("studentCode", stuCode);
 						Log.i("itemCode", itemCode);
 						Log.i("result", roundResult.getResult().toString());
 						// 创建一个请求对象
 						String url = "http://" + ip + ":" + number + Constant.ROUND_RESULT_SAVE_URL;
-						Request request = new Request.Builder()
-								.url(url + "?signature=" + HttpUtil.getSignatureVal(paramsValue)).post(body).build();
-						Log.i("url", url + "?signature=" + HttpUtil.getSignatureVal(paramsValue));
+						Request request = new Request.Builder().url(
+								url + "?signature=" + HttpUtil.getSignatureVal(paramsValue) + stringBuffer.toString())
+								.post(RequestBody.create(null, "")).build();
+						Log.i("url",
+								url + "?signature=" + HttpUtil.getSignatureVal(paramsValue) + stringBuffer.toString());
 						// 发送请求获取响应
 						Response response = okHttpClient.newCall(request).execute();
 						// 判断请求是否成功
@@ -331,8 +414,12 @@ public class OnlineActivity extends Activity {
 							String m = response.body().string();
 							if (m.equals("-3")) {
 								hasCount++;
+								Log.i("---", "已存在");
 							} else if (m.equals("1")) {
-								Log.i("---", "重复上传");
+								Log.i("---", "上传成功");
+							} else if (m.equals("1")) {
+								Log.i("---", "设备未开放");
+								return;
 							} else {
 								errorCount++;
 								log.error(count + "返回值： " + m + "上传失败" + roundResult);

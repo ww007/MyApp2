@@ -70,7 +70,7 @@ public class RunGradeActivity extends NFCActivity {
 	@Override
 	protected void onNewIntent(Intent intent) {
 		writeCard(intent);
-		readCard(intent);
+//		readCard(intent);
 	}
 
 	/**
@@ -83,15 +83,7 @@ public class RunGradeActivity extends NFCActivity {
 		try {
 			IItemService itemService = new NFCItemServiceImpl(intent);
 			student = itemService.IC_ReadStuInfo();
-			currentName = student.getStuName();
-
-			log.info("µ±Ç°¶Á¿¨Î»ÖÃ=>" + lvGrade.getFirstVisiblePosition() + "=>" + student.toString());
-
-			updateView(currentPosition, student);
-
-			currentPosition++;
-			adapter.setSelectItem(currentPosition);
-			adapter.notifyDataSetInvalidated();
+			showView();
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -107,8 +99,13 @@ public class RunGradeActivity extends NFCActivity {
 
 		try {
 			Log.i("title=", title);
+			IItemService itemService = new NFCItemServiceImpl(intent);
+			student = itemService.IC_ReadStuInfo();
+			if (student == null) {
+				NetUtil.showToast(context, "´Ë¿¨ÎÞÐ§");
+				return;
+			}
 			if (title.equals("50Ã×ÅÜ")) {
-				IItemService itemService = new NFCItemServiceImpl(intent);
 				String time = runGrades.get(currentPosition).getTime();
 				int result1 = Integer.parseInt(time.subSequence(0, 2).toString()) * 60 * 1000
 						+ Integer.parseInt(time.subSequence(3, 5).toString()) * 1000
@@ -120,7 +117,6 @@ public class RunGradeActivity extends NFCActivity {
 				boolean is50MResult = itemService.IC_WriteItemResult(ItemResult50M);
 				log.info("50Ã×ÅÜÐ´¿¨=>" + is50MResult);
 			} else if (title.equals("800/1000Ã×ÅÜ")) {
-				IItemService itemService = new NFCItemServiceImpl(intent);
 				String time = runGrades.get(currentPosition).getTime();
 				int result1 = Integer.parseInt(time.subSequence(0, 2).toString()) * 60 * 1000
 						+ Integer.parseInt(time.subSequence(3, 5).toString()) * 1000
@@ -132,7 +128,6 @@ public class RunGradeActivity extends NFCActivity {
 				boolean isMiddleRaceResult = itemService.IC_WriteItemResult(ItemResultMiddleRace);
 				log.info("800/1000Ã×ÅÜÐ´¿¨=>" + isMiddleRaceResult);
 			} else if (title.equals("50Ã×x8Íù·µÅÜ")) {
-				IItemService itemService = new NFCItemServiceImpl(intent);
 				String time = runGrades.get(currentPosition).getTime();
 				int result1 = Integer.parseInt(time.subSequence(0, 2).toString()) * 60 * 1000
 						+ Integer.parseInt(time.subSequence(3, 5).toString()) * 1000
@@ -144,10 +139,20 @@ public class RunGradeActivity extends NFCActivity {
 				boolean isZFPResult = itemService.IC_WriteItemResult(ItemResultZFP);
 				log.info("50Ã×x8Íù·µÅÜÐ´¿¨=>" + isZFPResult);
 			}
+			showView();
 
 		} catch (Exception e) {
 			log.error(title + "Ð´¿¨²Ù×÷Ê§°Ü");
 		}
+	}
+
+	private void showView() {
+		currentName = student.getStuName();
+		log.info("µ±Ç°¶Á¿¨Î»ÖÃ=>" + lvGrade.getFirstVisiblePosition() + "=>" + student.toString());
+		updateView(currentPosition, student);
+		currentPosition++;
+		adapter.setSelectItem(currentPosition);
+		adapter.notifyDataSetInvalidated();
 	}
 
 	private ArrayList<RunGrade> datas;
