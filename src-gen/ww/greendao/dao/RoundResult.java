@@ -11,6 +11,8 @@ public class RoundResult {
 
     private Long RoundResultID;
     private long StudentItemID;
+    private String studentCode;
+    private String itemCode;
     private Integer Result;
     private Integer RoundNo;
     private String TestTime;
@@ -37,9 +39,11 @@ public class RoundResult {
         this.RoundResultID = RoundResultID;
     }
 
-    public RoundResult(Long RoundResultID, long StudentItemID, Integer Result, Integer RoundNo, String TestTime, Integer ResultState, Integer IsLastResult, String Mac, String Remark1, String Remark2) {
+    public RoundResult(Long RoundResultID, long StudentItemID, String studentCode, String itemCode, Integer Result, Integer RoundNo, String TestTime, Integer ResultState, Integer IsLastResult, String Mac, String Remark1, String Remark2) {
         this.RoundResultID = RoundResultID;
         this.StudentItemID = StudentItemID;
+        this.studentCode = studentCode;
+        this.itemCode = itemCode;
         this.Result = Result;
         this.RoundNo = RoundNo;
         this.TestTime = TestTime;
@@ -70,6 +74,22 @@ public class RoundResult {
 
     public void setStudentItemID(long StudentItemID) {
         this.StudentItemID = StudentItemID;
+    }
+
+    public String getStudentCode() {
+        return studentCode;
+    }
+
+    public void setStudentCode(String studentCode) {
+        this.studentCode = studentCode;
+    }
+
+    public String getItemCode() {
+        return itemCode;
+    }
+
+    public void setItemCode(String itemCode) {
+        this.itemCode = itemCode;
     }
 
     public Integer getResult() {

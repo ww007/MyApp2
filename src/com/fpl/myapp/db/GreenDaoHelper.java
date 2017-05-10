@@ -3,8 +3,6 @@ package com.fpl.myapp.db;
 import org.apache.log4j.Logger;
 
 import com.fpl.myapp.log4j.LogUtil;
-import com.squareup.leakcanary.LeakCanary;
-
 import android.app.Application;
 import android.content.Context;
 import ww.greendao.dao.DaoMaster;
@@ -20,8 +18,6 @@ public class GreenDaoHelper extends Application {
 	@Override
 	public void onCreate() {
 		super.onCreate();
-		// 初始化leakcanary
-		LeakCanary.install(this);
 		// 配置log4j基本参数
 		LogUtil.configLog();
 

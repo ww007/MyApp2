@@ -19,7 +19,7 @@ import ww.greendao.dao.Classes;
 /** 
  * DAO for table CLASSES.
 */
-public class ClassesDao extends AbstractDao<Classes, Void> {
+public class ClassesDao extends AbstractDao<Classes, Long> {
 
     public static final String TABLENAME = "CLASSES";
 
@@ -28,10 +28,11 @@ public class ClassesDao extends AbstractDao<Classes, Void> {
      * Can be used for QueryBuilder and for referencing column names.
     */
     public static class Properties {
-        public final static Property GradeCode = new Property(0, String.class, "GradeCode", false, "GRADE_CODE");
-        public final static Property ClassCode = new Property(1, String.class, "ClassCode", false, "CLASS_CODE");
-        public final static Property ClassName = new Property(2, String.class, "ClassName", false, "CLASS_NAME");
-        public final static Property Remark1 = new Property(3, String.class, "Remark1", false, "REMARK1");
+        public final static Property ClassID = new Property(0, Long.class, "ClassID", true, "CLASS_ID");
+        public final static Property GradeID = new Property(1, long.class, "GradeID", false, "GRADE_ID");
+        public final static Property ClassCode = new Property(2, String.class, "ClassCode", false, "CLASS_CODE");
+        public final static Property ClassName = new Property(3, String.class, "ClassName", false, "CLASS_NAME");
+        public final static Property Remark1 = new Property(4, String.class, "Remark1", false, "REMARK1");
     };
 
     private DaoSession daoSession;
@@ -51,10 +52,11 @@ public class ClassesDao extends AbstractDao<Classes, Void> {
     public static void createTable(SQLiteDatabase db, boolean ifNotExists) {
         String constraint = ifNotExists? "IF NOT EXISTS ": "";
         db.execSQL("CREATE TABLE " + constraint + "'CLASSES' (" + //
-                "'GRADE_CODE' TEXT NOT NULL ," + // 0: GradeCode
-                "'CLASS_CODE' TEXT UNIQUE ," + // 1: ClassCode
-                "'CLASS_NAME' TEXT," + // 2: ClassName
-                "'REMARK1' TEXT);"); // 3: Remark1
+                "'CLASS_ID' INTEGER PRIMARY KEY AUTOINCREMENT ," + // 0: ClassID
+                "'GRADE_ID' INTEGER NOT NULL ," + // 1: GradeID
+                "'CLASS_CODE' TEXT UNIQUE ," + // 2: ClassCode
+                "'CLASS_NAME' TEXT," + // 3: ClassName
+                "'REMARK1' TEXT);"); // 4: Remark1
     }
 
     /** Drops the underlying database table. */
@@ -67,21 +69,26 @@ public class ClassesDao extends AbstractDao<Classes, Void> {
     @Override
     protected void bindValues(SQLiteStatement stmt, Classes entity) {
         stmt.clearBindings();
-        stmt.bindString(1, entity.getGradeCode());
+ 
+        Long ClassID = entity.getClassID();
+        if (ClassID != null) {
+            stmt.bindLong(1, ClassID);
+        }
+        stmt.bindLong(2, entity.getGradeID());
  
         String ClassCode = entity.getClassCode();
         if (ClassCode != null) {
-            stmt.bindString(2, ClassCode);
+            stmt.bindString(3, ClassCode);
         }
  
         String ClassName = entity.getClassName();
         if (ClassName != null) {
-            stmt.bindString(3, ClassName);
+            stmt.bindString(4, ClassName);
         }
  
         String Remark1 = entity.getRemark1();
         if (Remark1 != null) {
-            stmt.bindString(4, Remark1);
+            stmt.bindString(5, Remark1);
         }
     }
 
@@ -93,18 +100,19 @@ public class ClassesDao extends AbstractDao<Classes, Void> {
 
     /** @inheritdoc */
     @Override
-    public Void readKey(Cursor cursor, int offset) {
-        return null;
+    public Long readKey(Cursor cursor, int offset) {
+        return cursor.isNull(offset + 0) ? null : cursor.getLong(offset + 0);
     }    
 
     /** @inheritdoc */
     @Override
     public Classes readEntity(Cursor cursor, int offset) {
         Classes entity = new Classes( //
-            cursor.getString(offset + 0), // GradeCode
-            cursor.isNull(offset + 1) ? null : cursor.getString(offset + 1), // ClassCode
-            cursor.isNull(offset + 2) ? null : cursor.getString(offset + 2), // ClassName
-            cursor.isNull(offset + 3) ? null : cursor.getString(offset + 3) // Remark1
+            cursor.isNull(offset + 0) ? null : cursor.getLong(offset + 0), // ClassID
+            cursor.getLong(offset + 1), // GradeID
+            cursor.isNull(offset + 2) ? null : cursor.getString(offset + 2), // ClassCode
+            cursor.isNull(offset + 3) ? null : cursor.getString(offset + 3), // ClassName
+            cursor.isNull(offset + 4) ? null : cursor.getString(offset + 4) // Remark1
         );
         return entity;
     }
@@ -112,23 +120,28 @@ public class ClassesDao extends AbstractDao<Classes, Void> {
     /** @inheritdoc */
     @Override
     public void readEntity(Cursor cursor, Classes entity, int offset) {
-        entity.setGradeCode(cursor.getString(offset + 0));
-        entity.setClassCode(cursor.isNull(offset + 1) ? null : cursor.getString(offset + 1));
-        entity.setClassName(cursor.isNull(offset + 2) ? null : cursor.getString(offset + 2));
-        entity.setRemark1(cursor.isNull(offset + 3) ? null : cursor.getString(offset + 3));
+        entity.setClassID(cursor.isNull(offset + 0) ? null : cursor.getLong(offset + 0));
+        entity.setGradeID(cursor.getLong(offset + 1));
+        entity.setClassCode(cursor.isNull(offset + 2) ? null : cursor.getString(offset + 2));
+        entity.setClassName(cursor.isNull(offset + 3) ? null : cursor.getString(offset + 3));
+        entity.setRemark1(cursor.isNull(offset + 4) ? null : cursor.getString(offset + 4));
      }
     
     /** @inheritdoc */
     @Override
-    protected Void updateKeyAfterInsert(Classes entity, long rowId) {
-        // Unsupported or missing PK type
-        return null;
+    protected Long updateKeyAfterInsert(Classes entity, long rowId) {
+        entity.setClassID(rowId);
+        return rowId;
     }
     
     /** @inheritdoc */
     @Override
-    public Void getKey(Classes entity) {
-        return null;
+    public Long getKey(Classes entity) {
+        if(entity != null) {
+            return entity.getClassID();
+        } else {
+            return null;
+        }
     }
 
     /** @inheritdoc */
@@ -138,16 +151,16 @@ public class ClassesDao extends AbstractDao<Classes, Void> {
     }
     
     /** Internal query to resolve the "allClass" to-many relationship of Grade. */
-    public List<Classes> _queryGrade_AllClass(String GradeCode) {
+    public List<Classes> _queryGrade_AllClass(long GradeID) {
         synchronized (this) {
             if (grade_AllClassQuery == null) {
                 QueryBuilder<Classes> queryBuilder = queryBuilder();
-                queryBuilder.where(Properties.GradeCode.eq(null));
+                queryBuilder.where(Properties.GradeID.eq(null));
                 grade_AllClassQuery = queryBuilder.build();
             }
         }
         Query<Classes> query = grade_AllClassQuery.forCurrentThread();
-        query.setParameter(0, GradeCode);
+        query.setParameter(0, GradeID);
         return query.list();
     }
 
@@ -160,7 +173,7 @@ public class ClassesDao extends AbstractDao<Classes, Void> {
             builder.append(',');
             SqlUtils.appendColumns(builder, "T0", daoSession.getGradeDao().getAllColumns());
             builder.append(" FROM CLASSES T");
-            builder.append(" LEFT JOIN GRADE T0 ON T.'GRADE_CODE'=T0.'GRADE_CODE'");
+            builder.append(" LEFT JOIN GRADE T0 ON T.'GRADE_ID'=T0.'GRADE_ID'");
             builder.append(' ');
             selectDeep = builder.toString();
         }

@@ -1,9 +1,23 @@
-package com.fpl.myapp.activity.project;
+package com.fpl.myapp.activity;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
+import com.fpl.myapp.activity.project.BroadJumpActivity;
+import com.fpl.myapp.activity.project.HeightAndWeightActivity;
+import com.fpl.myapp.activity.project.InfraredBallActivity;
+import com.fpl.myapp.activity.project.JumpHeightActivity;
+import com.fpl.myapp.activity.project.PullUpActivity;
+import com.fpl.myapp.activity.project.PushUpActivity;
+import com.fpl.myapp.activity.project.RopeSkippingActivity;
+import com.fpl.myapp.activity.project.Run50Activity;
+import com.fpl.myapp.activity.project.Run800Activity;
+import com.fpl.myapp.activity.project.ShuttleRunActivity;
+import com.fpl.myapp.activity.project.SitAndReachActivity;
+import com.fpl.myapp.activity.project.SitUpActivity;
+import com.fpl.myapp.activity.project.VisionActivity;
+import com.fpl.myapp.activity.project.VitalCapacityActivity;
 import com.fpl.myapp2.R;
 import android.app.Activity;
 import android.app.AlertDialog;

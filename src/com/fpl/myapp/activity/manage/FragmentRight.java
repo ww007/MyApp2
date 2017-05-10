@@ -63,12 +63,12 @@ public class FragmentRight extends Fragment {
 			HttpUtil.getStudentInfo(context);
 		}
 	};
-	Runnable getStudentItem = new Runnable() {
-		@Override
-		public void run() {
-			HttpUtil.getStudentItemInfo(context);
-		}
-	};
+	// Runnable getStudentItem = new Runnable() {
+	// @Override
+	// public void run() {
+	// HttpUtil.getStudentItemInfo(context);
+	// }
+	// };
 
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -91,7 +91,7 @@ public class FragmentRight extends Fragment {
 		initView(view);
 		setListener();
 
-//		getItems();
+		// getItems();
 		return view;
 	}
 
@@ -174,8 +174,6 @@ public class FragmentRight extends Fragment {
 			mHandler.post(updateItem);
 			if (DbService.getInstance(context).loadAllStudent().isEmpty()) {
 				mHandler.post(getStudent);
-			} else if (DbService.getInstance(context).loadAllStudentItem().isEmpty()) {
-				mHandler.post(getStudentItem);
 			}
 		} else {
 			NetUtil.checkNetwork(getActivity());

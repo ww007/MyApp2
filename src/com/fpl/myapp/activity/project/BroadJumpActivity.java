@@ -21,10 +21,13 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.pm.ActivityInfo;
+import android.content.res.Configuration;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.InputType;
 import android.text.TextWatcher;
+import android.view.Display;
 import android.view.KeyEvent;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -72,6 +75,7 @@ public class BroadJumpActivity extends NFCActivity {
 	private List<ww.greendao.dao.Student> stuByCode;
 	private SharedPreferences mSharedPreferences;
 	private int readStyle;
+	private int orientation;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -90,18 +94,39 @@ public class BroadJumpActivity extends NFCActivity {
 				stuData = "";
 			}
 		}
-		List<Item> items = DbService.getInstance(context).queryItemByName("立定跳远");
-		if (items.isEmpty()) {
+		Item items = DbService.getInstance(context).queryItemByName("立定跳远");
+		if (items == null) {
 			max = "";
 			min = "";
 		} else {
-			max = items.get(0).getMaxValue() / 10 + "";
-			min = items.get(0).getMinValue() / 10 + "";
+			max = items.getMaxValue() / 10 + "";
+			min = items.getMinValue() / 10 + "";
 		}
 
 		initView();
 		setListener();
 	}
+
+	// @Override
+	// protected void onResume() {
+	// orientation = ActivityInfo.SCREEN_ORIENTATION_USER;
+	// this.setRequestedOrientation(orientation);
+	// Display display = getWindowManager().getDefaultDisplay();
+	// int width = display.getWidth();
+	// int height = display.getHeight();
+	// if (width > height) {
+	// orientation = ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE;
+	// } else {
+	// orientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT;
+	// }
+	// super.onResume();
+	// }
+
+	// @Override
+	// public void onConfigurationChanged(Configuration newConfig) {
+	// super.onConfigurationChanged(newConfig);
+	// this.setRequestedOrientation(orientation);
+	// }
 
 	@Override
 	public void onNewIntent(Intent intent) {
@@ -357,8 +382,11 @@ public class BroadJumpActivity extends NFCActivity {
 						return;
 					}
 					grade = etChengji.getText().toString();
+
+					String itemCode = DbService.getInstance(context).queryItemByMachineCode(Constant.BROAD_JUMP + "")
+							.getItemCode();
 					studentItems = DbService.getInstance(context).queryStudentItemByCode(tvNumber.getText().toString(),
-							"E09");
+							itemCode);
 					if (studentItems == null) {
 						Toast.makeText(context, "当前学生项目不存在", Toast.LENGTH_SHORT).show();
 						return;

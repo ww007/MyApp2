@@ -30,14 +30,16 @@ public class RoundResultDao extends AbstractDao<RoundResult, Long> {
     public static class Properties {
         public final static Property RoundResultID = new Property(0, Long.class, "RoundResultID", true, "ROUND_RESULT_ID");
         public final static Property StudentItemID = new Property(1, long.class, "StudentItemID", false, "STUDENT_ITEM_ID");
-        public final static Property Result = new Property(2, Integer.class, "Result", false, "RESULT");
-        public final static Property RoundNo = new Property(3, Integer.class, "RoundNo", false, "ROUND_NO");
-        public final static Property TestTime = new Property(4, String.class, "TestTime", false, "TEST_TIME");
-        public final static Property ResultState = new Property(5, Integer.class, "ResultState", false, "RESULT_STATE");
-        public final static Property IsLastResult = new Property(6, Integer.class, "IsLastResult", false, "IS_LAST_RESULT");
-        public final static Property Mac = new Property(7, String.class, "Mac", false, "MAC");
-        public final static Property Remark1 = new Property(8, String.class, "Remark1", false, "REMARK1");
-        public final static Property Remark2 = new Property(9, String.class, "Remark2", false, "REMARK2");
+        public final static Property StudentCode = new Property(2, String.class, "studentCode", false, "STUDENT_CODE");
+        public final static Property ItemCode = new Property(3, String.class, "itemCode", false, "ITEM_CODE");
+        public final static Property Result = new Property(4, Integer.class, "Result", false, "RESULT");
+        public final static Property RoundNo = new Property(5, Integer.class, "RoundNo", false, "ROUND_NO");
+        public final static Property TestTime = new Property(6, String.class, "TestTime", false, "TEST_TIME");
+        public final static Property ResultState = new Property(7, Integer.class, "ResultState", false, "RESULT_STATE");
+        public final static Property IsLastResult = new Property(8, Integer.class, "IsLastResult", false, "IS_LAST_RESULT");
+        public final static Property Mac = new Property(9, String.class, "Mac", false, "MAC");
+        public final static Property Remark1 = new Property(10, String.class, "Remark1", false, "REMARK1");
+        public final static Property Remark2 = new Property(11, String.class, "Remark2", false, "REMARK2");
     };
 
     private DaoSession daoSession;
@@ -59,14 +61,16 @@ public class RoundResultDao extends AbstractDao<RoundResult, Long> {
         db.execSQL("CREATE TABLE " + constraint + "'ROUND_RESULT' (" + //
                 "'ROUND_RESULT_ID' INTEGER PRIMARY KEY AUTOINCREMENT ," + // 0: RoundResultID
                 "'STUDENT_ITEM_ID' INTEGER NOT NULL ," + // 1: StudentItemID
-                "'RESULT' INTEGER," + // 2: Result
-                "'ROUND_NO' INTEGER," + // 3: RoundNo
-                "'TEST_TIME' TEXT," + // 4: TestTime
-                "'RESULT_STATE' INTEGER," + // 5: ResultState
-                "'IS_LAST_RESULT' INTEGER," + // 6: IsLastResult
-                "'MAC' TEXT," + // 7: Mac
-                "'REMARK1' TEXT," + // 8: Remark1
-                "'REMARK2' TEXT);"); // 9: Remark2
+                "'STUDENT_CODE' TEXT," + // 2: studentCode
+                "'ITEM_CODE' TEXT," + // 3: itemCode
+                "'RESULT' INTEGER," + // 4: Result
+                "'ROUND_NO' INTEGER," + // 5: RoundNo
+                "'TEST_TIME' TEXT," + // 6: TestTime
+                "'RESULT_STATE' INTEGER," + // 7: ResultState
+                "'IS_LAST_RESULT' INTEGER," + // 8: IsLastResult
+                "'MAC' TEXT," + // 9: Mac
+                "'REMARK1' TEXT," + // 10: Remark1
+                "'REMARK2' TEXT);"); // 11: Remark2
     }
 
     /** Drops the underlying database table. */
@@ -86,44 +90,54 @@ public class RoundResultDao extends AbstractDao<RoundResult, Long> {
         }
         stmt.bindLong(2, entity.getStudentItemID());
  
+        String studentCode = entity.getStudentCode();
+        if (studentCode != null) {
+            stmt.bindString(3, studentCode);
+        }
+ 
+        String itemCode = entity.getItemCode();
+        if (itemCode != null) {
+            stmt.bindString(4, itemCode);
+        }
+ 
         Integer Result = entity.getResult();
         if (Result != null) {
-            stmt.bindLong(3, Result);
+            stmt.bindLong(5, Result);
         }
  
         Integer RoundNo = entity.getRoundNo();
         if (RoundNo != null) {
-            stmt.bindLong(4, RoundNo);
+            stmt.bindLong(6, RoundNo);
         }
  
         String TestTime = entity.getTestTime();
         if (TestTime != null) {
-            stmt.bindString(5, TestTime);
+            stmt.bindString(7, TestTime);
         }
  
         Integer ResultState = entity.getResultState();
         if (ResultState != null) {
-            stmt.bindLong(6, ResultState);
+            stmt.bindLong(8, ResultState);
         }
  
         Integer IsLastResult = entity.getIsLastResult();
         if (IsLastResult != null) {
-            stmt.bindLong(7, IsLastResult);
+            stmt.bindLong(9, IsLastResult);
         }
  
         String Mac = entity.getMac();
         if (Mac != null) {
-            stmt.bindString(8, Mac);
+            stmt.bindString(10, Mac);
         }
  
         String Remark1 = entity.getRemark1();
         if (Remark1 != null) {
-            stmt.bindString(9, Remark1);
+            stmt.bindString(11, Remark1);
         }
  
         String Remark2 = entity.getRemark2();
         if (Remark2 != null) {
-            stmt.bindString(10, Remark2);
+            stmt.bindString(12, Remark2);
         }
     }
 
@@ -145,14 +159,16 @@ public class RoundResultDao extends AbstractDao<RoundResult, Long> {
         RoundResult entity = new RoundResult( //
             cursor.isNull(offset + 0) ? null : cursor.getLong(offset + 0), // RoundResultID
             cursor.getLong(offset + 1), // StudentItemID
-            cursor.isNull(offset + 2) ? null : cursor.getInt(offset + 2), // Result
-            cursor.isNull(offset + 3) ? null : cursor.getInt(offset + 3), // RoundNo
-            cursor.isNull(offset + 4) ? null : cursor.getString(offset + 4), // TestTime
-            cursor.isNull(offset + 5) ? null : cursor.getInt(offset + 5), // ResultState
-            cursor.isNull(offset + 6) ? null : cursor.getInt(offset + 6), // IsLastResult
-            cursor.isNull(offset + 7) ? null : cursor.getString(offset + 7), // Mac
-            cursor.isNull(offset + 8) ? null : cursor.getString(offset + 8), // Remark1
-            cursor.isNull(offset + 9) ? null : cursor.getString(offset + 9) // Remark2
+            cursor.isNull(offset + 2) ? null : cursor.getString(offset + 2), // studentCode
+            cursor.isNull(offset + 3) ? null : cursor.getString(offset + 3), // itemCode
+            cursor.isNull(offset + 4) ? null : cursor.getInt(offset + 4), // Result
+            cursor.isNull(offset + 5) ? null : cursor.getInt(offset + 5), // RoundNo
+            cursor.isNull(offset + 6) ? null : cursor.getString(offset + 6), // TestTime
+            cursor.isNull(offset + 7) ? null : cursor.getInt(offset + 7), // ResultState
+            cursor.isNull(offset + 8) ? null : cursor.getInt(offset + 8), // IsLastResult
+            cursor.isNull(offset + 9) ? null : cursor.getString(offset + 9), // Mac
+            cursor.isNull(offset + 10) ? null : cursor.getString(offset + 10), // Remark1
+            cursor.isNull(offset + 11) ? null : cursor.getString(offset + 11) // Remark2
         );
         return entity;
     }
@@ -162,14 +178,16 @@ public class RoundResultDao extends AbstractDao<RoundResult, Long> {
     public void readEntity(Cursor cursor, RoundResult entity, int offset) {
         entity.setRoundResultID(cursor.isNull(offset + 0) ? null : cursor.getLong(offset + 0));
         entity.setStudentItemID(cursor.getLong(offset + 1));
-        entity.setResult(cursor.isNull(offset + 2) ? null : cursor.getInt(offset + 2));
-        entity.setRoundNo(cursor.isNull(offset + 3) ? null : cursor.getInt(offset + 3));
-        entity.setTestTime(cursor.isNull(offset + 4) ? null : cursor.getString(offset + 4));
-        entity.setResultState(cursor.isNull(offset + 5) ? null : cursor.getInt(offset + 5));
-        entity.setIsLastResult(cursor.isNull(offset + 6) ? null : cursor.getInt(offset + 6));
-        entity.setMac(cursor.isNull(offset + 7) ? null : cursor.getString(offset + 7));
-        entity.setRemark1(cursor.isNull(offset + 8) ? null : cursor.getString(offset + 8));
-        entity.setRemark2(cursor.isNull(offset + 9) ? null : cursor.getString(offset + 9));
+        entity.setStudentCode(cursor.isNull(offset + 2) ? null : cursor.getString(offset + 2));
+        entity.setItemCode(cursor.isNull(offset + 3) ? null : cursor.getString(offset + 3));
+        entity.setResult(cursor.isNull(offset + 4) ? null : cursor.getInt(offset + 4));
+        entity.setRoundNo(cursor.isNull(offset + 5) ? null : cursor.getInt(offset + 5));
+        entity.setTestTime(cursor.isNull(offset + 6) ? null : cursor.getString(offset + 6));
+        entity.setResultState(cursor.isNull(offset + 7) ? null : cursor.getInt(offset + 7));
+        entity.setIsLastResult(cursor.isNull(offset + 8) ? null : cursor.getInt(offset + 8));
+        entity.setMac(cursor.isNull(offset + 9) ? null : cursor.getString(offset + 9));
+        entity.setRemark1(cursor.isNull(offset + 10) ? null : cursor.getString(offset + 10));
+        entity.setRemark2(cursor.isNull(offset + 11) ? null : cursor.getString(offset + 11));
      }
     
     /** @inheritdoc */

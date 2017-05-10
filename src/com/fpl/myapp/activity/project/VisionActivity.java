@@ -96,14 +96,14 @@ public class VisionActivity extends NFCActivity {
 			}
 		}
 
-		List<Item> items = DbService.getInstance(context).queryItemByName("视力");
+		Item items = DbService.getInstance(context).queryItemByName("视力");
 
-		if (items.isEmpty()) {
+		if (items == null) {
 			max = "";
 			min = "";
 		} else {
-			max = items.get(0).getMaxValue().toString();
-			min = items.get(0).getMinValue().toString();
+			max = items.getMaxValue().toString();
+			min = items.getMinValue().toString();
 		}
 
 		initView();
@@ -329,8 +329,13 @@ public class VisionActivity extends NFCActivity {
 						return;
 					}
 
-					String itemCode = DbService.getInstance(context).queryItemByMachineCode(Constant.VISION + "").get(0)
+					String itemCode = DbService.getInstance(context).queryItemByMachineCode(Constant.VISION + "")
 							.getItemCode();
+					// long stuID =
+					// DbService.getInstance(context).queryStudentByCode(tvNumber.getText().toString()).get(0)
+					// .getStudentID();
+					// long itemID =
+					// DbService.getInstance(context).queryItemByCode(itemCode).getItemID();
 					studentItems = DbService.getInstance(context).queryStudentItemByCode(tvNumber.getText().toString(),
 							itemCode);
 

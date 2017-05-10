@@ -16,6 +16,7 @@ import com.fpl.myapp.entity.PH_Grade;
 import com.fpl.myapp.entity.PH_School;
 import com.fpl.myapp.entity.PH_Student;
 import com.fpl.myapp.entity.PH_StudentItem;
+import com.fpl.myapp.util.HttpUtil;
 import com.fpl.myapp.util.NetUtil;
 import com.wnb.android.nfc.dataobject.entity.IC_Result;
 
@@ -39,15 +40,13 @@ public class SaveDBUtil {
 	private static List<PH_School> schools = new ArrayList<>();
 	private static List<PH_Grade> grades = new ArrayList<>();
 	private static List<PH_Class> classes = new ArrayList<>();
-	private static long flag = -1;
 	public static int over = 0;
 	private static NotificationManager notificationManager;
-	private static ArrayList<Student> mStudents;
+	private static ArrayList<Student> mStudents = new ArrayList<>();
 	private static AsyncSession mAsyncSession = DbService.mDaoSession.startAsyncSession();
 	private static ArrayList<StudentItem> mStudentItems;
 	private static ArrayList<Classes> mClasses;
 	private static ArrayList<Grade> mGrade;
-	private static long startTime;
 
 	/**
 	 * 数据库中查询所有成绩并存入IC卡
@@ -75,18 +74,12 @@ public class SaveDBUtil {
 	}
 
 	/**
-	 * 存储学生信息到数据库
+	 * 存储学校、班级、年级到数据库
 	 * 
 	 * @param response
-	 *            获取到的学生信息
-	 * @param students
-	 *            学生对象
 	 * @param context
-	 * @return
 	 */
-	public static int saveStudentDB(String response, List<PH_Student> students, Context context) {
-		startTime = System.currentTimeMillis();
-		mStudents = new ArrayList<Student>();
+	public static void saveStudentDB(String response, Context context) {
 		mClasses = new ArrayList<Classes>();
 		mGrade = new ArrayList<Grade>();
 		// 解析获取的Json数据
@@ -109,24 +102,28 @@ public class SaveDBUtil {
 			String schoolName = grades.get(i).getSchoolName();
 			String gradeCode = grades.get(i).getGradeCode();
 			String gradeName = grades.get(i).getGradeName();
-			Long SchoolID = DbService.getInstance(context).querySchoolByName(schoolName).get(0).getSchoolID();
-			Grade grade = new Grade(SchoolID, gradeCode, gradeName, null);
+			Long SchoolID = DbService.getInstance(context).querySchoolByName(schoolName).getSchoolID();
+			Grade grade = new Grade(null, SchoolID, gradeCode, gradeName, null);
 			mGrade.add(grade);
 		}
-		mAsyncSession.runInTx(new Runnable() {
-			@Override
-			public void run() {
-				DbService.gradeDao.insertOrReplaceInTx(mGrade);
-				Log.i("mGrade", mGrade.size() + "");
-				Log.i("----------", "保存年级信息完成");
-			}
-		});
+		DbService.gradeDao.insertOrReplaceInTx(mGrade);
+		Log.i("mGrade", mGrade.size() + "");
+		Log.i("----------", "保存年级信息完成");
+		// mAsyncSession.runInTx(new Runnable() {
+		// @Override
+		// public void run() {
+		// DbService.gradeDao.insertOrReplaceInTx(mGrade);
+		// Log.i("mGrade", mGrade.size() + "");
+		// Log.i("----------", "保存年级信息完成");
+		// }
+		// });
 		// 保存班级信息
 		for (int i = 0; i < classes.size(); i++) {
 			String gradeCode = classes.get(i).getGradeCode();
 			String classCode = classes.get(i).getClassCode();
 			String className = classes.get(i).getClassName();
-			Classes newClass = new Classes(gradeCode, classCode, className, null);
+			long gradeID = DbService.getInstance(context).queryGradeByCode(gradeCode).getGradeID();
+			Classes newClass = new Classes(null, gradeID, classCode, className, null);
 			mClasses.add(newClass);
 		}
 		mAsyncSession.runInTx(new Runnable() {
@@ -137,27 +134,42 @@ public class SaveDBUtil {
 				Log.i("----------", "保存班级信息完成");
 			}
 		});
-		// 保存学生信息
-		for (int i = 0; i < students.size(); i++) {
-			Student student = new Student(students.get(i).getStudentCode(), students.get(i).getStudentName(),
-					students.get(i).getSex(), students.get(i).getClassCode(), students.get(i).getGradeCode(),
-					students.get(i).getIDCardNo(), students.get(i).getICCardNo(), students.get(i).getDownloadTime(),
-					null, null, null);
-			mStudents.add(student);
-		}
-		mAsyncSession.runInTx(new Runnable() {
+	}
+
+	/**
+	 * 存储学生信息到数据库
+	 * 
+	 * @param context
+	 * @param students
+	 */
+	public static void saveStudentPage(final Context context, final List<PH_Student> students) {
+		new Thread(new Runnable() {
 			@Override
 			public void run() {
-				DbService.studentDao.insertOrReplaceInTx(mStudents);
-				Log.i("students", mStudents.size() + "");
-				Log.i("----------", "保存学生信息完成");
+				// 保存学生信息
+				Log.i("students.size()---", students.size() + "");
+				for (int i = 0; i < students.size(); i++) {
+					String calssCode = students.get(i).getClassCode();
+					String gradeCode = students.get(i).getGradeCode();
+					Long classID = DbService.getInstance(context).queryClassesByCode(calssCode).getClassID();
+					Long gradeID = DbService.getInstance(context).queryGradeByCode(gradeCode).getGradeID();
+					Student student = new Student(null, students.get(i).getStudentCode(),
+							students.get(i).getStudentName(), students.get(i).getSex(), classID, gradeID,
+							students.get(i).getIDCardNo(), students.get(i).getICCardNo(),
+							students.get(i).getDownloadTime(), null, null, null);
+					mStudents.add(student);
+				}
+				mAsyncSession.runInTx(new Runnable() {
+					@Override
+					public void run() {
+						DbService.studentDao.insertOrReplaceInTx(mStudents);
+						Log.i("students", mStudents.size() + "");
+						Log.i("----------", "保存学生信息完成");
+					}
+				});
 			}
-		});
-		if (mStudents.size() != 0 && flag != -1) {
-			return 1;
-		} else {
-			return 0;
-		}
+		}).start();
+
 	}
 
 	/**
@@ -166,27 +178,56 @@ public class SaveDBUtil {
 	 * @param studentItems
 	 *            获取到的学生项目信息
 	 * @param context
+	 * @param i
+	 * @param j
 	 * @param totalPage
 	 */
-	public static void saveStudentItemDB(List<PH_StudentItem> studentItems, Context context) {
-		mStudentItems = new ArrayList<>();
-		for (PH_StudentItem stuItem : studentItems) {
-			String itemCode = stuItem.getItemCode();
-			String studentCode = stuItem.getStudentCode();
-			StudentItem studentItem = new StudentItem(null, studentCode, itemCode, null, 0, null, 0, null, null, null);
-			mStudentItems.add(studentItem);
-		}
-		mAsyncSession.runInTx(new Runnable() {
+	private static ArrayList<RoundResult> mRoundResults;
+
+	public static void saveStudentItemDB(final List<PH_StudentItem> studentItems, final Context context,
+			final int totalPage, final int currentPage) {
+		new Thread(new Runnable() {
+
 			@Override
 			public void run() {
-				DbService.studentItemDao.insertOrReplaceInTx(mStudentItems);
-				long endTime = System.currentTimeMillis();
-				long hasTime = endTime - startTime;
-				Log.i("初始化用时：", hasTime + "ms");
-				Log.i("mStudentItems", mStudentItems.size() + "");
-				Log.i("----------", "保存学生项目信息完成");
+				mStudentItems = new ArrayList<>();
+				mRoundResults = new ArrayList<RoundResult>();
+				int i = 0;
+				for (PH_StudentItem stuItem : studentItems) {
+					i++;
+					String itemCode = stuItem.getItemCode();
+					String studentCode = stuItem.getStudentCode();
+					StudentItem studentItem = new StudentItem(null, studentCode, itemCode, null, 0, null, 0, null, null,
+							null);
+					RoundResult roundResult = new RoundResult(null, i, studentCode, itemCode, i, 1,
+							"2017-05-10 16:50:59", 0, 0, "359261051106776", null, null);
+					mStudentItems.add(studentItem);
+					mRoundResults.add(roundResult);
+				}
+				
+				DbService.roundResultDao.insertOrReplaceInTx(mRoundResults);
+				
+				mAsyncSession.runInTx(new Runnable() {
+					@Override
+					public void run() {
+						DbService.studentItemDao.insertOrReplaceInTx(mStudentItems);
+						Log.i("currentPage----------", "保存学生项目信息完成");
+						Log.i("mStudentItems", mStudentItems.size() + "");
+						showNotification(context);
+					}
+				});
 			}
-		});
+		}).start();
+	}
+
+	/**
+	 * 数据下载保存完后提示信息
+	 * 
+	 * @param context
+	 */
+	private static void showNotification(final Context context) {
+		long hasTime = System.currentTimeMillis() - HttpUtil.startTime;
+		Log.i("初始化用时：", hasTime + "");
 		Notification.Builder builder = new Notification.Builder(context);
 		builder.setSmallIcon(R.drawable.app);
 		builder.setLargeIcon(BitmapFactory.decodeResource(context.getResources(), R.drawable.app));
@@ -228,13 +269,19 @@ public class SaveDBUtil {
 		String itemCode = "";
 		if (tvTitle.equals("身高") || tvTitle.equals("体重") || tvTitle.equals("1000米跑") || tvTitle.equals("800米跑")
 				|| tvTitle.equals("左眼视力") || tvTitle.equals("右眼视力")) {
-			itemCode = DbService.getInstance(context).queryItemByName(tvTitle).get(0).getItemCode();
+			itemCode = DbService.getInstance(context).queryItemByName(tvTitle).getItemCode();
+			// itemID =
+			// DbService.getInstance(context).queryItemByName(tvTitle).getItemID();
 		} else {
-			itemCode = DbService.getInstance(context).queryItemByMachineCode(code).get(0).getItemCode();
+			itemCode = DbService.getInstance(context).queryItemByMachineCode(code).getItemCode();
+			// itemID =
+			// DbService.getInstance(context).queryItemByMachineCode(code).getItemID();
 		}
 
+		// long stuID =
+		// DbService.getInstance(context).queryStudentByCode(stuCode).get(0).getStudentID();
 		StudentItem studentItems = DbService.getInstance(context).queryStudentItemByCode(stuCode, itemCode);
-		if (studentItems==null) {
+		if (studentItems == null) {
 			return 0;
 		}
 		Long studentItemID = studentItems.getStudentItemID();
@@ -257,8 +304,8 @@ public class SaveDBUtil {
 		Log.i("currentTime--->", currentTime);
 		// 存储当前测试轮次
 		String macAddress = NetUtil.getLocalMacAddressFromWifiInfo(context);
-		RoundResult roundResult = new RoundResult(null, studentItemID, currentResult, RoundNo, currentTime, resultState,
-				0, macAddress, null, null);
+		RoundResult roundResult = new RoundResult(null, studentItemID, stuCode, itemCode, currentResult, RoundNo,
+				currentTime, resultState, 0, macAddress, null, null);
 		DbService.getInstance(context).saveRoundResult(roundResult);
 
 		return 1;

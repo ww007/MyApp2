@@ -92,19 +92,19 @@ public class HeightAndWeightActivity extends NFCActivity {
 			}
 		}
 
-		List<Item> items = DbService.getInstance(context).queryItemByCode("E01");
-		List<Item> items2 = DbService.getInstance(context).queryItemByCode("E02");
+		Item items = DbService.getInstance(context).queryItemByCode("E01");
+		Item items2 = DbService.getInstance(context).queryItemByCode("E02");
 
-		if (items.isEmpty()) {
+		if (items == null) {
 			hMax = "";
 			hMin = "";
 			wMax = "";
 			wMin = "";
 		} else {
-			hMax = items.get(0).getMaxValue() / 10 + "";
-			hMin = items.get(0).getMinValue() / 10 + "";
-			wMax = items2.get(0).getMaxValue() / 1000 + "";
-			wMin = items2.get(0).getMinValue() / 1000 + "";
+			hMax = items.getMaxValue() / 10 + "";
+			hMin = items.getMinValue() / 10 + "";
+			wMax = items2.getMaxValue() / 1000 + "";
+			wMin = items2.getMinValue() / 1000 + "";
 		}
 		initView();
 		setListener();
@@ -351,8 +351,9 @@ public class HeightAndWeightActivity extends NFCActivity {
 						etWeight.setText("");
 						return;
 					}
+					String itemCode = DbService.getInstance(context).queryItemByName("身高").getItemCode();
 					studentItems = DbService.getInstance(context).queryStudentItemByCode(tvNumber.getText().toString(),
-							"E01");
+							itemCode);
 					if (studentItems == null) {
 						Toast.makeText(context, "当前学生项目不存在", Toast.LENGTH_SHORT).show();
 					} else {

@@ -51,34 +51,34 @@ public class DbService {
 	}
 
 	// -------------------------------
-	public List<Classes> queryClassesByCode(String code) {
+	public Classes queryClassesByCode(String code) {
 		QueryBuilder<Classes> qb = classesDao.queryBuilder();
-		List<Classes> classes = qb.where(ClassesDao.Properties.ClassCode.eq(code)).list();
-		return classes;
+		qb.where(ClassesDao.Properties.ClassCode.eq(code));
+		return qb.unique();
 	}
 
-	public List<Grade> queryGradeByCode(String code) {
+	public Grade queryGradeByCode(String code) {
 		QueryBuilder<Grade> qb = gradeDao.queryBuilder();
-		List<Grade> grades = qb.where(GradeDao.Properties.GradeCode.eq(code)).list();
-		return grades;
+		qb.where(GradeDao.Properties.GradeCode.eq(code));
+		return qb.unique();
 	}
 
-	public List<Item> queryItemByCode(String code) {
+	public Item queryItemByCode(String code) {
 		QueryBuilder<Item> qb = itemDao.queryBuilder();
-		List<Item> items = qb.where(ItemDao.Properties.ItemCode.eq(code)).list();
-		return items;
+		qb.where(ItemDao.Properties.ItemCode.eq(code));
+		return qb.unique();
 	}
 
-	public List<Item> queryItemByName(String name) {
+	public Item queryItemByName(String name) {
 		QueryBuilder<Item> qb = itemDao.queryBuilder();
-		List<Item> items = qb.where(ItemDao.Properties.ItemName.eq(name)).list();
-		return items;
+		qb.where(ItemDao.Properties.ItemName.eq(name));
+		return qb.unique();
 	}
 
-	public List<Item> queryItemByMachineCode(String code) {
+	public Item queryItemByMachineCode(String code) {
 		QueryBuilder<Item> qb = itemDao.queryBuilder();
-		List<Item> items = qb.where(ItemDao.Properties.MachineCode.eq(code)).list();
-		return items;
+		qb.where(ItemDao.Properties.MachineCode.eq(code));
+		return qb.unique();
 	}
 
 	public List<Student> queryStudentByCode(String code) {
@@ -87,16 +87,16 @@ public class DbService {
 		return students;
 	}
 
-	public List<School> querySchoolByName(String name) {
+	public School querySchoolByName(String name) {
 		QueryBuilder<School> qb = schoolDao.queryBuilder();
-		List<School> schools = qb.where(SchoolDao.Properties.SchoolName.eq(name)).list();
-		return schools;
+		qb.where(SchoolDao.Properties.SchoolName.eq(name));
+		return qb.unique();
 	}
 
 	public List<RoundResult> queryRoundResultByID(long stuItemID) {
 		QueryBuilder<RoundResult> qb = roundResultDao.queryBuilder();
-		List<RoundResult> roundResults = qb.where(RoundResultDao.Properties.StudentItemID.eq(stuItemID)).list();
-		return roundResults;
+		List<RoundResult> roundresults = qb.where(RoundResultDao.Properties.StudentItemID.eq(stuItemID)).list();
+		return roundresults;
 	}
 
 	public List<RoundResult> queryRoundResultByResult(int result) {
@@ -105,6 +105,13 @@ public class DbService {
 		return roundResults;
 	}
 
+	// public StudentItem queryStudentItemByCode(String stuCode, String
+	// itemCode) {
+	// QueryBuilder<StudentItem> qb = studentItemDao.queryBuilder();
+	// qb.where(qb.and(StudentItemDao.Properties.StudentCode.eq(stuCode),
+	// StudentItemDao.Properties.ItemCode.eq(itemCode)));
+	// return qb.unique();
+	// }
 	public StudentItem queryStudentItemByCode(String stuCode, String itemCode) {
 		QueryBuilder<StudentItem> qb = studentItemDao.queryBuilder();
 		qb.where(qb.and(StudentItemDao.Properties.StudentCode.eq(stuCode),
@@ -112,11 +119,12 @@ public class DbService {
 		return qb.unique();
 	}
 
-	public List<StudentItem> queryStudentItemByStuCode(String stuCode) {
-		QueryBuilder<StudentItem> qb = studentItemDao.queryBuilder();
-		List<StudentItem> studentItems = qb.where(StudentItemDao.Properties.StudentCode.eq(stuCode)).list();
-		return studentItems;
-	}
+	// public List<StudentItem> queryStudentItemByStuCode(String stuCode) {
+	// QueryBuilder<StudentItem> qb = studentItemDao.queryBuilder();
+	// List<StudentItem> studentItems =
+	// qb.where(StudentItemDao.Properties.StudentCode.eq(stuCode)).list();
+	// return studentItems;
+	// }
 
 	// public Classes loadClasses(long id) {
 	// return classesDao.load(id);

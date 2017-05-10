@@ -91,14 +91,14 @@ public class VolleyballActivity extends NFCActivity {
 			}
 		}
 
-		List<Item> items = DbService.getInstance(context).queryItemByMachineCode(Constant.VOLLEYBALL + "");
+		Item items = DbService.getInstance(context).queryItemByMachineCode(Constant.VOLLEYBALL + "");
 
-		if (items.isEmpty()) {
+		if (items == null) {
 			max = "";
 			min = "";
 		} else {
-			max = items.get(0).getMaxValue().toString();
-			min = items.get(0).getMinValue().toString();
+			max = items.getMaxValue().toString();
+			min = items.getMinValue().toString();
 		}
 		initView();
 		setListener();
@@ -349,13 +349,13 @@ public class VolleyballActivity extends NFCActivity {
 					grade = etChengji.getText().toString();
 					// 查询数据库中保存的该学生项目成绩的轮次
 					String itemCode = DbService.getInstance(context).queryItemByMachineCode(Constant.VOLLEYBALL + "")
-							.get(0).getItemCode();
-					// long stuId =
+							.getItemCode();
+					// long stuID =
 					// DbService.getInstance(context).queryStudentByCode(tvNumber.getText().toString()).get(0)
 					// .getStudentID();
+					// long itemID = DbService.getInstance(context).queryItemByCode(itemCode).getItemID();
 					studentItems = DbService.getInstance(context).queryStudentItemByCode(tvNumber.getText().toString(),
 							itemCode);
-
 					if (studentItems == null) {
 						Toast.makeText(context, "当前学生项目不存在", Toast.LENGTH_SHORT).show();
 						return;

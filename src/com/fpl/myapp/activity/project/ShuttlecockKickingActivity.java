@@ -98,14 +98,14 @@ public class ShuttlecockKickingActivity extends NFCActivity {
 			}
 		}
 
-		List<Item> items = DbService.getInstance(context).queryItemByMachineCode(Constant.KICKING_SHUTTLECOCK + "");
+		Item items = DbService.getInstance(context).queryItemByMachineCode(Constant.KICKING_SHUTTLECOCK + "");
 
-		if (items.isEmpty()) {
+		if (items == null) {
 			max = "";
 			min = "";
 		} else {
-			max = items.get(0).getMaxValue().toString();
-			min = items.get(0).getMinValue().toString();
+			max = items.getMaxValue().toString();
+			min = items.getMinValue().toString();
 		}
 		initView();
 		setListener();
@@ -356,10 +356,12 @@ public class ShuttlecockKickingActivity extends NFCActivity {
 					grade = etChengji.getText().toString();
 					// 查询数据库中保存的该学生项目成绩的轮次
 					String itemCode = DbService.getInstance(context)
-							.queryItemByMachineCode(Constant.KICKING_SHUTTLECOCK + "").get(0).getItemCode();
-					// long stuId =
+							.queryItemByMachineCode(Constant.KICKING_SHUTTLECOCK + "").getItemCode();
+					// long stuID =
 					// DbService.getInstance(context).queryStudentByCode(tvNumber.getText().toString()).get(0)
 					// .getStudentID();
+					// long itemID =
+					// DbService.getInstance(context).queryItemByCode(itemCode).getItemID();
 					studentItems = DbService.getInstance(context).queryStudentItemByCode(tvNumber.getText().toString(),
 							itemCode);
 

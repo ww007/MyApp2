@@ -40,7 +40,7 @@ public class ICInformationActivity extends NFCActivity {
 	private TextView tvGender;
 	private ListView lvIcInfo;
 	private TextView tvShow;
-	private SharedPreferences sharedPreferences;
+	// private SharedPreferences sharedPreferences;
 
 	public ArrayList<String> projects = new ArrayList<>();
 	// private String[] newProject;
@@ -74,9 +74,10 @@ public class ICInformationActivity extends NFCActivity {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_icinformation);
 		// 读取本地存储的选中项目
-		sharedPreferences = getSharedPreferences("projects", Activity.MODE_PRIVATE);
-		int selected = sharedPreferences.getInt("size", 0);
-		Log.i("selected=", selected + "");
+		// sharedPreferences = getSharedPreferences("projects",
+		// Activity.MODE_PRIVATE);
+		// int selected = sharedPreferences.getInt("size", 0);
+		// Log.i("selected=", selected + "");
 
 		icInfo1 = new ICInfo();
 
@@ -196,6 +197,9 @@ public class ICInformationActivity extends NFCActivity {
 			Log.d(name + "：", itemResult.toString());
 			if (itemResult.getResult()[0].getResultFlag() != 1) {
 				Log.i(code + "", name + "没有成绩");
+				icInfo.setProjectTitle(name);
+				icInfo.setProjectValue("");
+				icInfos.add(icInfo);
 			} else {
 				icInfo.setProjectTitle(name);
 				icInfo.setProjectValue(itemResult.getResult()[0].getResultVal() + unit);
@@ -231,6 +235,12 @@ public class ICInformationActivity extends NFCActivity {
 			itemResultVision = itemService.IC_ReadItemResult(Constant.VISION);
 			if (itemResultVision.getResult()[0].getResultFlag() != 1) {
 				Log.i("", "视力没有数据");
+				icInfo.setProjectTitle("左眼视力");
+				icInfo.setProjectValue("");
+				icInfo1.setProjectTitle("右眼视力");
+				icInfo1.setProjectValue("");
+				icInfos.add(icInfo);
+				icInfos.add(icInfo1);
 			} else {
 				double left = itemResultVision.getResult()[0].getResultVal();
 				double right = itemResultVision.getResult()[2].getResultVal();
@@ -263,6 +273,9 @@ public class ICInformationActivity extends NFCActivity {
 			if (sex.equals("女")) {
 				if (itemResultMiddleRace.getResult()[0].getResultFlag() != 1) {
 					Log.i("", "800米跑没有成绩");
+					icInfo.setProjectTitle("800米跑");
+					icInfo.setProjectValue("");
+					icInfos.add(icInfo);
 				} else {
 					icInfo.setProjectTitle("800米跑");
 					icInfo.setProjectValue(itemResultMiddleRace.getResult()[0].getResultVal() + " ms");
@@ -271,6 +284,9 @@ public class ICInformationActivity extends NFCActivity {
 			} else {
 				if (itemResultMiddleRace.getResult()[0].getResultFlag() != 1) {
 					Log.i("", "1000米跑没有成绩");
+					icInfo.setProjectTitle("1000米跑");
+					icInfo.setProjectValue("");
+					icInfos.add(icInfo);
 				} else {
 					icInfo.setProjectTitle("1000米跑");
 					icInfo.setProjectValue(itemResultMiddleRace.getResult()[0].getResultVal() + " ms");
@@ -299,6 +315,12 @@ public class ICInformationActivity extends NFCActivity {
 			Log.i("读取身高体重测试", itemResultHW.toString());
 			if (itemResultHW.getResult()[0].getResultFlag() != 1) {
 				Log.i("", "身高体重没有数据");
+				icInfo.setProjectTitle("身高");
+				icInfo.setProjectValue("");
+				icInfo1.setProjectTitle("体重");
+				icInfo1.setProjectValue("");
+				icInfos.add(icInfo);
+				icInfos.add(icInfo1);
 			} else {
 				double height = itemResultHW.getResult()[0].getResultVal();
 				double weight = itemResultHW.getResult()[2].getResultVal();

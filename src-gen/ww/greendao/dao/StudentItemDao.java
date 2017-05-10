@@ -1,17 +1,12 @@
 package ww.greendao.dao;
 
-import java.util.List;
-import java.util.ArrayList;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteStatement;
 
 import de.greenrobot.dao.AbstractDao;
 import de.greenrobot.dao.Property;
-import de.greenrobot.dao.internal.SqlUtils;
 import de.greenrobot.dao.internal.DaoConfig;
-import de.greenrobot.dao.query.Query;
-import de.greenrobot.dao.query.QueryBuilder;
 
 import ww.greendao.dao.StudentItem;
 
@@ -29,8 +24,8 @@ public class StudentItemDao extends AbstractDao<StudentItem, Long> {
     */
     public static class Properties {
         public final static Property StudentItemID = new Property(0, Long.class, "StudentItemID", true, "STUDENT_ITEM_ID");
-        public final static Property StudentCode = new Property(1, String.class, "StudentCode", false, "STUDENT_CODE");
-        public final static Property ItemCode = new Property(2, String.class, "ItemCode", false, "ITEM_CODE");
+        public final static Property StudentCode = new Property(1, String.class, "studentCode", false, "STUDENT_CODE");
+        public final static Property ItemCode = new Property(2, String.class, "itemCode", false, "ITEM_CODE");
         public final static Property LastResult = new Property(3, Integer.class, "lastResult", false, "LAST_RESULT");
         public final static Property ResultState = new Property(4, Integer.class, "resultState", false, "RESULT_STATE");
         public final static Property LastTestTime = new Property(5, String.class, "lastTestTime", false, "LAST_TEST_TIME");
@@ -42,8 +37,6 @@ public class StudentItemDao extends AbstractDao<StudentItem, Long> {
 
     private DaoSession daoSession;
 
-    private Query<StudentItem> student_StudentItems1Query;
-    private Query<StudentItem> item_StudentItems2Query;
 
     public StudentItemDao(DaoConfig config) {
         super(config);
@@ -59,8 +52,8 @@ public class StudentItemDao extends AbstractDao<StudentItem, Long> {
         String constraint = ifNotExists? "IF NOT EXISTS ": "";
         db.execSQL("CREATE TABLE " + constraint + "'STUDENT_ITEM' (" + //
                 "'STUDENT_ITEM_ID' INTEGER PRIMARY KEY AUTOINCREMENT ," + // 0: StudentItemID
-                "'STUDENT_CODE' TEXT NOT NULL ," + // 1: StudentCode
-                "'ITEM_CODE' TEXT NOT NULL ," + // 2: ItemCode
+                "'STUDENT_CODE' TEXT," + // 1: studentCode
+                "'ITEM_CODE' TEXT," + // 2: itemCode
                 "'LAST_RESULT' INTEGER," + // 3: lastResult
                 "'RESULT_STATE' INTEGER," + // 4: resultState
                 "'LAST_TEST_TIME' TEXT," + // 5: lastTestTime
@@ -85,8 +78,16 @@ public class StudentItemDao extends AbstractDao<StudentItem, Long> {
         if (StudentItemID != null) {
             stmt.bindLong(1, StudentItemID);
         }
-        stmt.bindString(2, entity.getStudentCode());
-        stmt.bindString(3, entity.getItemCode());
+ 
+        String studentCode = entity.getStudentCode();
+        if (studentCode != null) {
+            stmt.bindString(2, studentCode);
+        }
+ 
+        String itemCode = entity.getItemCode();
+        if (itemCode != null) {
+            stmt.bindString(3, itemCode);
+        }
  
         Integer lastResult = entity.getLastResult();
         if (lastResult != null) {
@@ -141,8 +142,8 @@ public class StudentItemDao extends AbstractDao<StudentItem, Long> {
     public StudentItem readEntity(Cursor cursor, int offset) {
         StudentItem entity = new StudentItem( //
             cursor.isNull(offset + 0) ? null : cursor.getLong(offset + 0), // StudentItemID
-            cursor.getString(offset + 1), // StudentCode
-            cursor.getString(offset + 2), // ItemCode
+            cursor.isNull(offset + 1) ? null : cursor.getString(offset + 1), // studentCode
+            cursor.isNull(offset + 2) ? null : cursor.getString(offset + 2), // itemCode
             cursor.isNull(offset + 3) ? null : cursor.getInt(offset + 3), // lastResult
             cursor.isNull(offset + 4) ? null : cursor.getInt(offset + 4), // resultState
             cursor.isNull(offset + 5) ? null : cursor.getString(offset + 5), // lastTestTime
@@ -158,8 +159,8 @@ public class StudentItemDao extends AbstractDao<StudentItem, Long> {
     @Override
     public void readEntity(Cursor cursor, StudentItem entity, int offset) {
         entity.setStudentItemID(cursor.isNull(offset + 0) ? null : cursor.getLong(offset + 0));
-        entity.setStudentCode(cursor.getString(offset + 1));
-        entity.setItemCode(cursor.getString(offset + 2));
+        entity.setStudentCode(cursor.isNull(offset + 1) ? null : cursor.getString(offset + 1));
+        entity.setItemCode(cursor.isNull(offset + 2) ? null : cursor.getString(offset + 2));
         entity.setLastResult(cursor.isNull(offset + 3) ? null : cursor.getInt(offset + 3));
         entity.setResultState(cursor.isNull(offset + 4) ? null : cursor.getInt(offset + 4));
         entity.setLastTestTime(cursor.isNull(offset + 5) ? null : cursor.getString(offset + 5));
@@ -192,134 +193,4 @@ public class StudentItemDao extends AbstractDao<StudentItem, Long> {
         return true;
     }
     
-    /** Internal query to resolve the "studentItems1" to-many relationship of Student. */
-    public List<StudentItem> _queryStudent_StudentItems1(String StudentCode) {
-        synchronized (this) {
-            if (student_StudentItems1Query == null) {
-                QueryBuilder<StudentItem> queryBuilder = queryBuilder();
-                queryBuilder.where(Properties.StudentCode.eq(null));
-                student_StudentItems1Query = queryBuilder.build();
-            }
-        }
-        Query<StudentItem> query = student_StudentItems1Query.forCurrentThread();
-        query.setParameter(0, StudentCode);
-        return query.list();
-    }
-
-    /** Internal query to resolve the "studentItems2" to-many relationship of Item. */
-    public List<StudentItem> _queryItem_StudentItems2(String ItemCode) {
-        synchronized (this) {
-            if (item_StudentItems2Query == null) {
-                QueryBuilder<StudentItem> queryBuilder = queryBuilder();
-                queryBuilder.where(Properties.ItemCode.eq(null));
-                item_StudentItems2Query = queryBuilder.build();
-            }
-        }
-        Query<StudentItem> query = item_StudentItems2Query.forCurrentThread();
-        query.setParameter(0, ItemCode);
-        return query.list();
-    }
-
-    private String selectDeep;
-
-    protected String getSelectDeep() {
-        if (selectDeep == null) {
-            StringBuilder builder = new StringBuilder("SELECT ");
-            SqlUtils.appendColumns(builder, "T", getAllColumns());
-            builder.append(',');
-            SqlUtils.appendColumns(builder, "T0", daoSession.getStudentDao().getAllColumns());
-            builder.append(',');
-            SqlUtils.appendColumns(builder, "T1", daoSession.getItemDao().getAllColumns());
-            builder.append(" FROM STUDENT_ITEM T");
-            builder.append(" LEFT JOIN STUDENT T0 ON T.'STUDENT_CODE'=T0.'STUDENT_CODE'");
-            builder.append(" LEFT JOIN ITEM T1 ON T.'ITEM_CODE'=T1.'ITEM_CODE'");
-            builder.append(' ');
-            selectDeep = builder.toString();
-        }
-        return selectDeep;
-    }
-    
-    protected StudentItem loadCurrentDeep(Cursor cursor, boolean lock) {
-        StudentItem entity = loadCurrent(cursor, 0, lock);
-        int offset = getAllColumns().length;
-
-        Student student = loadCurrentOther(daoSession.getStudentDao(), cursor, offset);
-         if(student != null) {
-            entity.setStudent(student);
-        }
-        offset += daoSession.getStudentDao().getAllColumns().length;
-
-        Item item = loadCurrentOther(daoSession.getItemDao(), cursor, offset);
-         if(item != null) {
-            entity.setItem(item);
-        }
-
-        return entity;    
-    }
-
-    public StudentItem loadDeep(Long key) {
-        assertSinglePk();
-        if (key == null) {
-            return null;
-        }
-
-        StringBuilder builder = new StringBuilder(getSelectDeep());
-        builder.append("WHERE ");
-        SqlUtils.appendColumnsEqValue(builder, "T", getPkColumns());
-        String sql = builder.toString();
-        
-        String[] keyArray = new String[] { key.toString() };
-        Cursor cursor = db.rawQuery(sql, keyArray);
-        
-        try {
-            boolean available = cursor.moveToFirst();
-            if (!available) {
-                return null;
-            } else if (!cursor.isLast()) {
-                throw new IllegalStateException("Expected unique result, but count was " + cursor.getCount());
-            }
-            return loadCurrentDeep(cursor, true);
-        } finally {
-            cursor.close();
-        }
-    }
-    
-    /** Reads all available rows from the given cursor and returns a list of new ImageTO objects. */
-    public List<StudentItem> loadAllDeepFromCursor(Cursor cursor) {
-        int count = cursor.getCount();
-        List<StudentItem> list = new ArrayList<StudentItem>(count);
-        
-        if (cursor.moveToFirst()) {
-            if (identityScope != null) {
-                identityScope.lock();
-                identityScope.reserveRoom(count);
-            }
-            try {
-                do {
-                    list.add(loadCurrentDeep(cursor, false));
-                } while (cursor.moveToNext());
-            } finally {
-                if (identityScope != null) {
-                    identityScope.unlock();
-                }
-            }
-        }
-        return list;
-    }
-    
-    protected List<StudentItem> loadDeepAllAndCloseCursor(Cursor cursor) {
-        try {
-            return loadAllDeepFromCursor(cursor);
-        } finally {
-            cursor.close();
-        }
-    }
-    
-
-    /** A raw-style query where you can pass any WHERE clause and arguments. */
-    public List<StudentItem> queryDeep(String where, String... selectionArg) {
-        Cursor cursor = db.rawQuery(getSelectDeep() + where, selectionArg);
-        return loadDeepAllAndCloseCursor(cursor);
-    }
- 
 }

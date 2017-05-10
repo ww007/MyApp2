@@ -16,6 +16,7 @@ import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.fpl.myapp.db.DbService;
 import com.fpl.myapp.db.SaveDBUtil;
+import com.fpl.myapp.entity.First_Student;
 import com.fpl.myapp.entity.First_StudentItem;
 import com.fpl.myapp.entity.PH_Student;
 import com.fpl.myapp.entity.PH_StudentItem;
@@ -30,12 +31,13 @@ import okhttp3.Response;
 import ww.greendao.dao.Item;
 
 public class HttpUtil {
-	private static List<PH_StudentItem> studentItems;
+	private static List<PH_StudentItem> studentItems = new ArrayList<>();
 	private static List<Item> itemList;
 	public static int okFlag;
+	public static long startTime = 0;
 
 	/**
-	 * OKhttp发送http get请求
+	 * OKhttp发送请求
 	 * 
 	 * @param path
 	 * @param params
@@ -48,7 +50,8 @@ public class HttpUtil {
 			@Override
 			public void run() {
 				// 创建okHttpClient对象
-				OkHttpClient mOkHttpClient = new OkHttpClient();
+				OkHttpClient mOkHttpClient = new OkHttpClient().newBuilder().connectTimeout(100, TimeUnit.SECONDS)
+						.readTimeout(100, TimeUnit.SECONDS).build();
 				StringBuilder stringBuilder = new StringBuilder();
 				stringBuilder.append(path).append("?");
 				try {
@@ -89,8 +92,6 @@ public class HttpUtil {
 
 	}
 
-
-
 	/**
 	 * MD5加密
 	 * 
@@ -121,6 +122,7 @@ public class HttpUtil {
 			return null;
 		}
 	}
+
 	public static String getSignatureVal1(Map<String, String> paramMap, int pageNo) {
 		try {
 			StringBuilder stringBuilder = new StringBuilder();
@@ -153,7 +155,7 @@ public class HttpUtil {
 	 * @return
 	 * @throws Exception
 	 */
-	private static String getMD5(String str) throws Exception {
+	public static String getMD5(String str) throws Exception {
 		try {
 			// 生成一个MD5加密计算摘要
 			// MessageDigest md = MessageDigest.getInstance("MD5");
@@ -169,15 +171,14 @@ public class HttpUtil {
 	}
 
 	private static int studentFlag;
-	private static List<PH_Student> students;
+	private static List<PH_Student> students = new ArrayList<>();
 	private static boolean StuItemFlag;
 	private static int itemFlag;
 
 	/**
-	 * 获取学生信息
+	 * 获取学校、班级、年级信息
 	 * 
 	 * @param context
-	 * @param mAsyncSession
 	 * @return
 	 */
 	public static int getStudentInfo(final Context context) {
@@ -188,15 +189,8 @@ public class HttpUtil {
 			sendOkhttp(Constant.STUDENT_URL, null, new HttpCallbackListener() {
 				@Override
 				public void onFinish(String response) {
-					com.alibaba.fastjson.JSONObject jsonObject = JSON.parseObject(response);
-					JSONArray jsonStudent = jsonObject.getJSONArray("student");
-					students = JSON.parseArray(jsonStudent.toJSONString(), PH_Student.class);
-					if (DbService.getInstance(context).loadAllStudent().size() != students.size()) {
-						studentFlag = SaveDBUtil.saveStudentDB(response, students, context);
-					} else {
-						Log.i("存在", "学生信息已存在");
-					}
-					HttpUtil.getStudentItemInfo(context);
+					SaveDBUtil.saveStudentDB(response, context);
+					sendOkHttpForStudentPage(Constant.STUDENT_Page_URL, 1, context);
 				}
 
 				@Override
@@ -215,12 +209,107 @@ public class HttpUtil {
 		}
 	}
 
-	public static void sendOkhttp0(final String path, final int i, final Map<String, String> params,
+	private static int currentStuPage = 0;
+	private static List<PH_Student> totalStudents = new ArrayList<>();
+
+	/**
+	 * 发送学生分页请求
+	 * 
+	 * @param studentPageUrl
+	 * @param i
+	 *            页数
+	 * @param context
+	 */
+	private static void sendOkHttpForStudentPage(final String studentPageUrl, final int i, final Context context) {
+		new Thread(new Runnable() {
+
+			@Override
+			public void run() {
+				final OkHttpClient client = new OkHttpClient().newBuilder().readTimeout(50, TimeUnit.SECONDS).build();
+				StringBuilder stringBuilder = new StringBuilder();
+				stringBuilder.append(studentPageUrl).append("?pageNo=" + i + "&" + "pageSize=1000");
+				stringBuilder.append("&signature=" + getSignatureVal2(i));
+				Log.i("stringBuilder.toString()", stringBuilder.toString());
+				Request request = new Request.Builder().url(stringBuilder.toString()).get().build();
+				final Call call = client.newCall(request);
+				call.enqueue(new Callback() {
+
+					@Override
+					public void onResponse(Call arg0, Response response) throws IOException {
+						String result = response.body().string();
+						First_Student currentStudent = JSON.parseObject(result, First_Student.class);
+						currentStuPage = currentStudent.getPageNo();
+						List<PH_Student> currentResult = currentStudent.getResult();
+						Log.i("student当前页", currentStudent.getPageNo() + "");
+						if (i == 1) {
+							totalStudents = currentResult;
+						} else {
+							totalStudents.addAll(currentResult);
+						}
+						currentStuPage++;
+						if (currentStudent.getPageNo() == currentStudent.getTotalPage()) {
+							HttpUtil.getStudentItemInfo(context);
+							SaveDBUtil.saveStudentPage(context, totalStudents);
+							return;
+						} else {
+							sendOkHttpForStudentPage(Constant.STUDENT_Page_URL, currentStuPage, context);
+						}
+					}
+
+					@Override
+					public void onFailure(Call arg0, IOException arg1) {
+						Log.e("下载失败", arg1 + "");
+						sendOkHttpForStudentPage(Constant.STUDENT_Page_URL, currentStuPage, context);
+					}
+				});
+			}
+		}).start();
+
+	}
+
+	/**
+	 * 获取学生分页信息加密
+	 * 
+	 * @param pageNo
+	 * @return
+	 */
+	protected static String getSignatureVal2(int pageNo) {
+		try {
+			StringBuilder stringBuilder = new StringBuilder();
+			List<String> list = new ArrayList<String>();
+			list.add("pageNo");
+			list.add(pageNo + "");
+			list.add("pageSize");
+			list.add("1000");
+			// 字典排序
+			Collections.sort(list);
+			for (int i = 0; i < list.size(); i++) {
+				stringBuilder.append(list.get(i));
+			}
+			stringBuilder.append(Constant.TOKEN);
+			return HttpUtil.getMD5(stringBuilder.toString());
+		} catch (Exception e) {
+			// TODO: handle exception
+			return null;
+		}
+	}
+
+	private static int currentPage = 0;
+
+	/**
+	 * 发送学生项目分页请求
+	 * 
+	 * @param path
+	 * @param i
+	 * @param params
+	 * @param context
+	 */
+	public static void sendOkhttpForStudentItem(final String path, final int i, final Map<String, String> params,
 			final Context context) {
 		new Thread(new Runnable() {
 			@Override
 			public void run() {
-				final OkHttpClient client = new OkHttpClient().newBuilder().readTimeout(10, TimeUnit.SECONDS).build();
+				final OkHttpClient client = new OkHttpClient().newBuilder().readTimeout(50, TimeUnit.SECONDS).build();
 				StringBuilder stringBuilder = new StringBuilder();
 				stringBuilder.append(path).append("?pageNo=" + i + "&");
 				if (params != null && params.size() != 0) {
@@ -245,25 +334,29 @@ public class HttpUtil {
 					public void onResponse(Call arg0, Response response) throws IOException {
 						String result = response.body().string();
 						First_StudentItem currentStuItem = JSON.parseObject(result, First_StudentItem.class);
-						int currentPage = currentStuItem.getPageNo();
+						currentPage = currentStuItem.getPageNo();
 						List<PH_StudentItem> currentResult = currentStuItem.getResult();
 						if (i == 1) {
 							studentItems = currentStuItem.getResult();
 						} else {
 							studentItems.addAll(currentResult);
 						}
-						Log.i("当前页--当前大小", currentStuItem.getPageNo() + "--" + studentItems.size());
+						Log.i("studentItem当前页", currentStuItem.getPageNo() + "");
 						currentPage++;
-						if (studentItems.size() == currentStuItem.getTotalCount()) {
-							SaveDBUtil.saveStudentItemDB(studentItems, context);
+						if (currentStuItem.getPageNo() == currentStuItem.getTotalPage()) {
+							Log.i("studentItems", studentItems.size() + "");
+							SaveDBUtil.saveStudentItemDB(studentItems, context, currentStuItem.getTotalPage(),
+									currentStuItem.getPageNo());
+							return;
 						} else {
-							sendOkhttp0(Constant.STUDENT_ITEM_URL, currentPage, null, context);
+							sendOkhttpForStudentItem(Constant.STUDENT_ITEM_URL, currentPage, null, context);
 						}
 					}
 
 					@Override
 					public void onFailure(Call arg0, IOException arg1) {
 						Log.e("下载失败", arg1 + "");
+						sendOkhttpForStudentItem(Constant.STUDENT_ITEM_URL, currentPage, null, context);
 					}
 				});
 			}
@@ -280,7 +373,7 @@ public class HttpUtil {
 			String m = getMD5("fpl@*!");
 			Map<String, String> map = new HashMap<>();
 			map.put("signature", m);
-			sendOkhttp0(Constant.STUDENT_ITEM_URL, 1, null, context);
+			sendOkhttpForStudentItem(Constant.STUDENT_ITEM_URL, 1, null, context);
 		} catch (Exception e) {
 			Toast.makeText(context, "服务器连接异常...", Toast.LENGTH_SHORT).show();
 			e.printStackTrace();
@@ -295,6 +388,7 @@ public class HttpUtil {
 	 */
 	public static int getItemInfo(final Context context) {
 		try {
+			startTime = System.currentTimeMillis();
 			String m = HttpUtil.getMD5("fpl@*!");
 			Map<String, String> map = new HashMap<>();
 			map.put("signature", m);

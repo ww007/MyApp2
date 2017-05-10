@@ -38,22 +38,16 @@ public interface Constant {
 	public static final int REQUEST_SCAN_MODE_ALL_MODE = 0X300;
 
 	public static final String STUDENT_URL = "http://192.168.0.65:8080/sys_tccx/phone/studentInfo/getInfo.action";
+	public static final String STUDENT_Page_URL = "http://192.168.0.65:8080/sys_tccx/phone/studentInfo/getStuPage.action";
 	public static final String ITEM_URL = "http://192.168.0.65:8080/sys_tccx/phone/item/getItems.action";
 	public static final String STUDENT_ITEM_URL = "http://192.168.0.65:8080/sys_tccx/phone/StuItem/getStuItems.action";
 	public static final String STUDENT_ITEM_SAVE_URL = "http://192.168.0.65:8080/sys_tccx/phone/StuItem/saveStuItem.action";
-	public static final String ROUND_RESULT_SAVE_URL = "/sys_tccx/phone/RoundResult/saveRoundResult.action";
+	public static final String ROUND_RESULT_SAVE_URL = "/sys_tccx/phone/RoundResult/savePage.action";
 
 	public static final String TOKEN = "fpl@*!";
-	public static final String GET = "GET";
-	public static final String POST = "POST";
 
 	public static final int HEIGHT_WEIGHT = 1;// 身高体重
-	public static final String HEIGHT_CODE = "E01";// 身高
-	public static final String WEIGHT_CODE = "E02";// 体重
-
 	public static final int VITAL_CAPACITY = 2;// 肺活量
-	// public static final String VITAL_CAPACITY_CODE = 2;// 肺活量
-
 	public static final int BROAD_JUMP = 3;// 立定跳远
 	public static final int JUMP_HEIGHT = 4;// 摸高
 	public static final int PUSH_UP = 5;// 俯卧撑

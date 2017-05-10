@@ -5,7 +5,7 @@
     android:layout_height="match_parent"
     android:background="@drawable/project_background"
     android:gravity="center"
-    tools:context="com.fpl.myapp.activity.project.ProjectSelectionActivity" >
+    tools:context="com.fpl.myapp.activity.ProjectSelectionActivity" >
 
     <LinearLayout
         android:layout_width="match_parent"

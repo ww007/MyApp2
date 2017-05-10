@@ -10,6 +10,7 @@ import de.greenrobot.dao.DaoException;
  */
 public class Grade {
 
+    private Long GradeID;
     private Long SchoolID;
     private String GradeCode;
     private String GradeName;
@@ -29,11 +30,12 @@ public class Grade {
     public Grade() {
     }
 
-    public Grade(String GradeCode) {
-        this.GradeCode = GradeCode;
+    public Grade(Long GradeID) {
+        this.GradeID = GradeID;
     }
 
-    public Grade(Long SchoolID, String GradeCode, String GradeName, String Remark1) {
+    public Grade(Long GradeID, Long SchoolID, String GradeCode, String GradeName, String Remark1) {
+        this.GradeID = GradeID;
         this.SchoolID = SchoolID;
         this.GradeCode = GradeCode;
         this.GradeName = GradeName;
@@ -44,6 +46,14 @@ public class Grade {
     public void __setDaoSession(DaoSession daoSession) {
         this.daoSession = daoSession;
         myDao = daoSession != null ? daoSession.getGradeDao() : null;
+    }
+
+    public Long getGradeID() {
+        return GradeID;
+    }
+
+    public void setGradeID(Long GradeID) {
+        this.GradeID = GradeID;
     }
 
     public Long getSchoolID() {
@@ -110,7 +120,7 @@ public class Grade {
                 throw new DaoException("Entity is detached from DAO context");
             }
             ClassesDao targetDao = daoSession.getClassesDao();
-            List<Classes> allClassNew = targetDao._queryGrade_AllClass(GradeCode);
+            List<Classes> allClassNew = targetDao._queryGrade_AllClass(GradeID);
             synchronized (this) {
                 if(allClass == null) {
                     allClass = allClassNew;

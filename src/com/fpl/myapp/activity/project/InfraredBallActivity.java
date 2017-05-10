@@ -92,14 +92,14 @@ public class InfraredBallActivity extends NFCActivity {
 			}
 		}
 
-		List<Item> items = DbService.getInstance(context).queryItemByName("红外实心球");
+		Item items = DbService.getInstance(context).queryItemByName("红外实心球");
 
-		if (items.isEmpty()) {
+		if (items == null) {
 			max = "";
 			min = "";
 		} else {
-			max = items.get(0).getMaxValue().toString();
-			min = items.get(0).getMinValue().toString();
+			max = items.getMaxValue().toString();
+			min = items.getMinValue().toString();
 		}
 
 		initView();
@@ -350,10 +350,15 @@ public class InfraredBallActivity extends NFCActivity {
 					}
 					grade = etChengji.getText().toString();
 					String itemCode = DbService.getInstance(context).queryItemByMachineCode(Constant.INFRARED_BALL + "")
-							.get(0).getItemCode();
+							.getItemCode();
 					// String stuCode =
 					// DbService.getInstance(context).queryStudentByCode(tvNumber.getText().toString()).get(0)
 					// .getStudentCode();
+					// long stuID =
+					// DbService.getInstance(context).queryStudentByCode(tvNumber.getText().toString()).get(0)
+					// .getStudentID();
+					// long itemID =
+					// DbService.getInstance(context).queryItemByCode(itemCode).getItemID();
 					studentItems = DbService.getInstance(context).queryStudentItemByCode(tvNumber.getText().toString(),
 							itemCode);
 

@@ -69,7 +69,7 @@ public class RunGradeInputActivity extends NFCActivity {
 	private RadioButton rb3;
 	private String max;
 	private String min;
-	private List<Item> items;
+	private Item items;
 	private EditText etMs;
 	private EditText etS;
 	private EditText etSec;
@@ -121,12 +121,12 @@ public class RunGradeInputActivity extends NFCActivity {
 			items = DbService.getInstance(context).queryItemByMachineCode("15");
 		}
 
-		if (items.isEmpty()) {
+		if (items == null) {
 			max = "";
 			min = "";
 		} else {
-			max = items.get(0).getMaxValue().toString();
-			min = items.get(0).getMinValue().toString();
+			max = items.getMaxValue().toString();
+			min = items.getMinValue().toString();
 		}
 
 		initView();
@@ -499,8 +499,13 @@ public class RunGradeInputActivity extends NFCActivity {
 				}
 				if (title.equals("50米跑")) {
 					// 查询数据库中保存的该学生项目成绩的轮次
-					String itemCode = DbService.getInstance(context).queryItemByMachineCode(Constant.RUN50 + "").get(0)
+					String itemCode = DbService.getInstance(context).queryItemByMachineCode(Constant.RUN50 + "")
 							.getItemCode();
+					// long stuID =
+					// DbService.getInstance(context).queryStudentByCode(tvNumber.getText().toString()).get(0)
+					// .getStudentID();
+					// long itemID =
+					// DbService.getInstance(context).queryItemByCode(itemCode).getItemID();
 					studentItems = DbService.getInstance(context).queryStudentItemByCode(tvNumber.getText().toString(),
 							itemCode);
 					if (studentItems == null) {
@@ -509,19 +514,18 @@ public class RunGradeInputActivity extends NFCActivity {
 					} else {
 						resultState = 0;
 					}
-					flag = SaveDBUtil.saveGradesDB(context, tvNumber.getText().toString(), chengji, resultState, "18",
-							"50米跑");
+					flag = SaveDBUtil.saveGradesDB(context, tvNumber.getText().toString(), chengji, resultState,
+							Constant.RUN50 + "", "50米跑");
 					log.info("保存50米跑" + tvNumber.getText().toString() + "成绩：" + chengji);
 				} else if (title.equals("800/1000米跑")) {
-					String code;
+					String itemName;
 					String itemCode;
 					if (sex.equals("男")) {
-						code = "1000米跑";
-						itemCode = "E12";
+						itemName = "1000米跑";
 					} else {
-						code = "800米跑";
-						itemCode = "E13";
+						itemName = "800米跑";
 					}
+					itemCode = DbService.getInstance(context).queryItemByName(itemName).getItemCode();
 					// 查询数据库中保存的该学生项目成绩的轮次
 					studentItems = DbService.getInstance(context).queryStudentItemByCode(tvNumber.getText().toString(),
 							itemCode);
@@ -531,13 +535,18 @@ public class RunGradeInputActivity extends NFCActivity {
 					} else {
 						resultState = 0;
 					}
-					flag = SaveDBUtil.saveGradesDB(context, tvNumber.getText().toString(), chengji, resultState, "12",
-							code);
+					flag = SaveDBUtil.saveGradesDB(context, tvNumber.getText().toString(), chengji, resultState,
+							Constant.MIDDLE_RACE + "", itemName);
 					log.info("保存800/1000米跑" + tvNumber.getText().toString() + "成绩：" + chengji);
 				} else if (title.equals("50米x8往返跑")) {
 					// 查询数据库中保存的该学生项目成绩的轮次
 					String itemCode = DbService.getInstance(context).queryItemByMachineCode(Constant.SHUTTLE_RUN + "")
-							.get(0).getItemCode();
+							.getItemCode();
+					// long stuID =
+					// DbService.getInstance(context).queryStudentByCode(tvNumber.getText().toString()).get(0)
+					// .getStudentID();
+					// long itemID =
+					// DbService.getInstance(context).queryItemByCode(itemCode).getItemID();
 					studentItems = DbService.getInstance(context).queryStudentItemByCode(tvNumber.getText().toString(),
 							itemCode);
 					if (studentItems == null) {
@@ -546,8 +555,8 @@ public class RunGradeInputActivity extends NFCActivity {
 					} else {
 						resultState = 0;
 					}
-					flag = SaveDBUtil.saveGradesDB(context, tvNumber.getText().toString(), chengji, resultState, "15",
-							"50米x8往返跑");
+					flag = SaveDBUtil.saveGradesDB(context, tvNumber.getText().toString(), chengji, resultState,
+							Constant.SHUTTLE_RUN + "", "50米x8往返跑");
 					log.info("保存50米x8往返跑" + tvNumber.getText().toString() + "成绩：" + chengji);
 				}
 				btnCancel.setVisibility(View.GONE);
