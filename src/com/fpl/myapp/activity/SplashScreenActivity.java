@@ -42,7 +42,7 @@ public class SplashScreenActivity extends Activity {
 
 	private void isWifiConnected(boolean result) {
 		if (true == result) {
-			if (DbService.getInstance(context).loadAllStudentItem().isEmpty()) {
+			if (DbService.getInstance(context).getStudentItemsCount()==0) {
 				HttpUtil.getItemInfo(context);
 				if (HttpUtil.okFlag == 3000) {
 					SPLASH_TIME_OUT = 2000;

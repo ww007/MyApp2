@@ -80,6 +80,18 @@
             android:label="@string/title_activity_run50" >
         </activity>
         <activity
+            android:name="com.fpl.myapp.activity.project.BasketballActivity"
+            android:configChanges="orientation|keyboardHidden" >
+        </activity>
+        <activity
+            android:name="com.fpl.myapp.activity.project.FootballActivity"
+            android:configChanges="orientation|keyboardHidden" >
+        </activity>
+        <activity
+            android:name="com.fpl.myapp.activity.project.SwimActivity"
+            android:configChanges="orientation|keyboardHidden" >
+        </activity>
+        <activity
             android:name="com.fpl.myapp.activity.project.Run800Activity"
             android:configChanges="orientation|keyboardHidden"
             android:label="@string/title_activity_run800" >
@@ -202,7 +214,8 @@
 
                 <category android:name="android.intent.category.HOME" />
             </intent-filter>
-        </receiver>        -->
+        </receiver>
+        -->
         <activity
             android:name="com.fpl.myapp.activity.manage.ProjectManagerActivity"
             android:label="@string/title_activity_project_manager" >
@@ -217,7 +230,6 @@
             android:name="com.fpl.myapp.activity.manage.SharedpreferencesActivity"
             android:label="@string/title_activity_sharedpreferences" >
         </activity>
-
     </application>
 
 </manifest>

@@ -29,6 +29,8 @@ import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
 import android.view.View.OnClickListener;
+import android.view.inputmethod.EditorInfo;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.LinearLayout;
@@ -84,6 +86,7 @@ public class RunGradeInputActivity extends NFCActivity {
 	private int readStyle;
 	private Button btnScan;
 	private String title2 = "";
+	private int constant;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -114,12 +117,20 @@ public class RunGradeInputActivity extends NFCActivity {
 		}
 
 		if (title.equals("800/1000Ã×ÅÜ")) {
-			items = DbService.getInstance(context).queryItemByMachineCode("12");
+			constant = Constant.MIDDLE_RACE;
 		} else if (title.equals("50Ã×ÅÜ")) {
-			items = DbService.getInstance(context).queryItemByMachineCode("18");
+			constant = Constant.RUN50;
 		} else if (title.equals("50Ã×x8Íù·µÅÜ")) {
-			items = DbService.getInstance(context).queryItemByMachineCode("15");
+			constant = Constant.SHUTTLE_RUN;
+		} else if (title.equals("ÀºÇòÔËÇò")) {
+			constant = Constant.BASKETBALL_SKILL;
+		} else if (title.equals("×ãÇòÔËÇò")) {
+			constant = Constant.FOOTBALL_SKILL;
+		} else if (title.equals("ÓÎÓ¾")) {
+			constant = Constant.SWIM;
 		}
+
+		items = DbService.getInstance(context).queryItemByMachineCode(constant + "");
 
 		if (items == null) {
 			max = "";
@@ -178,15 +189,6 @@ public class RunGradeInputActivity extends NFCActivity {
 	 */
 	private void writeCard(Intent intent) {
 		try {
-
-			int constant = 0;
-			if (title.equals("50Ã×ÅÜ")) {
-				constant = Constant.RUN50;
-			} else if (title.equals("800/1000Ã×ÅÜ")) {
-				constant = Constant.MIDDLE_RACE;
-			} else if (title.equals("50Ã×x8Íù·µÅÜ")) {
-				constant = Constant.SHUTTLE_RUN;
-			}
 			IItemService itemService = new NFCItemServiceImpl(intent);
 
 			IC_Result[] resultRun = new IC_Result[4];
@@ -347,6 +349,36 @@ public class RunGradeInputActivity extends NFCActivity {
 	}
 
 	private void setListener() {
+		etSec.setOnClickListener(new OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				etSec.requestFocus();
+				etSec.setInputType(EditorInfo.TYPE_CLASS_PHONE);
+				InputMethodManager imm = (InputMethodManager) etSec.getContext()
+						.getSystemService(Context.INPUT_METHOD_SERVICE);
+				imm.toggleSoftInput(0, InputMethodManager.SHOW_FORCED);
+			}
+		});
+		etMs.setOnClickListener(new OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				etMs.requestFocus();
+				etMs.setInputType(EditorInfo.TYPE_CLASS_PHONE);
+				InputMethodManager imm = (InputMethodManager) etMs.getContext()
+						.getSystemService(Context.INPUT_METHOD_SERVICE);
+				imm.toggleSoftInput(0, InputMethodManager.SHOW_FORCED);
+			}
+		});
+		etS.setOnClickListener(new OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				etS.requestFocus();
+				etS.setInputType(EditorInfo.TYPE_CLASS_PHONE);
+				InputMethodManager imm = (InputMethodManager) etS.getContext()
+						.getSystemService(Context.INPUT_METHOD_SERVICE);
+				imm.toggleSoftInput(0, InputMethodManager.SHOW_FORCED);
+			}
+		});
 		btnScan.setOnClickListener(new OnClickListener() {
 			@Override
 			public void onClick(View v) {

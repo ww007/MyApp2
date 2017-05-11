@@ -239,20 +239,25 @@ public class HttpUtil {
 						String result = response.body().string();
 						First_Student currentStudent = JSON.parseObject(result, First_Student.class);
 						currentStuPage = currentStudent.getPageNo();
-						List<PH_Student> currentResult = currentStudent.getResult();
-						Log.i("student当前页", currentStudent.getPageNo() + "");
-						if (i == 1) {
-							totalStudents = currentResult;
-						} else {
-							totalStudents.addAll(currentResult);
-						}
-						currentStuPage++;
-						if (currentStudent.getPageNo() == currentStudent.getTotalPage()) {
+						if (currentStudent.getTotalCount() == DbService.getInstance(context).getStudentsCount()) {
+							Log.i("------------", DbService.getInstance(context).getStudentsCount() + "学生信息已存在");
 							HttpUtil.getStudentItemInfo(context);
-							SaveDBUtil.saveStudentPage(context, totalStudents);
-							return;
 						} else {
-							sendOkHttpForStudentPage(Constant.STUDENT_Page_URL, currentStuPage, context);
+							List<PH_Student> currentResult = currentStudent.getResult();
+							Log.i("student当前页", currentStudent.getPageNo() + "");
+							if (i == 1) {
+								totalStudents = currentResult;
+							} else {
+								totalStudents.addAll(currentResult);
+							}
+							currentStuPage++;
+							if (currentStudent.getPageNo() == currentStudent.getTotalPage()) {
+								HttpUtil.getStudentItemInfo(context);
+								SaveDBUtil.saveStudentPage(context, totalStudents);
+								return;
+							} else {
+								sendOkHttpForStudentPage(Constant.STUDENT_Page_URL, currentStuPage, context);
+							}
 						}
 					}
 
@@ -335,21 +340,26 @@ public class HttpUtil {
 						String result = response.body().string();
 						First_StudentItem currentStuItem = JSON.parseObject(result, First_StudentItem.class);
 						currentPage = currentStuItem.getPageNo();
-						List<PH_StudentItem> currentResult = currentStuItem.getResult();
-						if (i == 1) {
-							studentItems = currentStuItem.getResult();
-						} else {
-							studentItems.addAll(currentResult);
-						}
-						Log.i("studentItem当前页", currentStuItem.getPageNo() + "");
-						currentPage++;
-						if (currentStuItem.getPageNo() == currentStuItem.getTotalPage()) {
-							Log.i("studentItems", studentItems.size() + "");
-							SaveDBUtil.saveStudentItemDB(studentItems, context, currentStuItem.getTotalPage(),
-									currentStuItem.getPageNo());
+						if (currentStuItem.getTotalCount() == DbService.getInstance(context).getStudentItemsCount()) {
+							Log.i("-----------------", "学生项目信息已存在");
 							return;
 						} else {
-							sendOkhttpForStudentItem(Constant.STUDENT_ITEM_URL, currentPage, null, context);
+							List<PH_StudentItem> currentResult = currentStuItem.getResult();
+							if (i == 1) {
+								studentItems = currentStuItem.getResult();
+							} else {
+								studentItems.addAll(currentResult);
+							}
+							Log.i("studentItem当前页", currentStuItem.getPageNo() + "");
+							currentPage++;
+							if (currentStuItem.getPageNo() == currentStuItem.getTotalPage()) {
+								Log.i("studentItems", studentItems.size() + "");
+								SaveDBUtil.saveStudentItemDB(studentItems, context, currentStuItem.getTotalPage(),
+										currentStuItem.getPageNo());
+								return;
+							} else {
+								sendOkhttpForStudentItem(Constant.STUDENT_ITEM_URL, currentPage, null, context);
+							}
 						}
 					}
 

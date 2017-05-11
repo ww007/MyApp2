@@ -12,6 +12,7 @@ import com.fpl.myapp.activity.manage.SystemManagementActivity;
 import com.fpl.myapp.activity.online.OnlineActivity;
 import com.fpl.myapp.base.NFCActivity;
 import com.fpl.myapp.db.DbService;
+import com.fpl.myapp.db.SaveDBUtil;
 import com.wnb.android.nfc.dataobject.entity.ItemProperty;
 import com.wnb.android.nfc.dataobject.entity.Student;
 import com.wnb.android.nfc.dataobject.service.IItemService;
@@ -40,7 +41,7 @@ public class MainActivity extends NFCActivity {
 	private GridView gvMain;
 	private ArrayList<Map<String, Object>> dataList;
 	private SimpleAdapter simAdapter;
-	private static AsyncSession mAsyncSession = DbService.mDaoSession.startAsyncSession();
+//	private static AsyncSession mAsyncSession = DbService.mDaoSession.startAsyncSession();
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -52,40 +53,36 @@ public class MainActivity extends NFCActivity {
 		// 获取Android机IMEI号
 		TelephonyManager tm = (TelephonyManager) this.getSystemService(TELEPHONY_SERVICE);
 		final String IMEI = tm.getDeviceId();
-//		List<RoundResult> rounds = DbService.getInstance(this).loadAllRoundResult();
-//		Log.i("rounds", rounds.size() + "");
-		// DbService.getInstance(this).deleteAllRoundResult();
-
-		// new Thread(new Runnable() {
-		//
-		// @Override
-		// public void run() {
-		// final List<RoundResult> list = new ArrayList<>();
-		// RoundResult result = new RoundResult();
-		// for (int i = 0; i < 160000; i++) {
-		// result.setMac(IMEI);
-		// result.setItemCode("");
-		// result.setStudentCode("");
-		// result.setIsLastResult(0);
-		// result.setRemark1(null);
-		// result.setRemark2(null);
-		// result.setResult(i);
-		// result.setResultState(0);
-		// result.setRoundNo(1);
-		// result.setRoundResultID(null);
-		// result.setStudentItemID(i + 1);
-		// result.setTestTime("2017-05-05 09:40:35");
-		// list.add(result);
-		// }
-		// mAsyncSession.runInTx(new Runnable() {
-		// @Override
-		// public void run() {
-		// DbService.roundResultDao.insertOrReplaceInTx(list);
-		// Log.i("----------", list.size() + "保存完成");
-		// }
-		// });
-		// }
-		// }).start();
+//		new Thread(new Runnable() {
+//
+//			@Override
+//			public void run() {
+//				final List<RoundResult> list = new ArrayList<>();
+//				for (int i = 0; i < 160000; i++) {
+//					RoundResult result = new RoundResult();
+//					result.setMac(IMEI);
+//					result.setItemCode("2015244101");
+//					result.setStudentCode("E09");
+//					result.setIsLastResult(0);
+//					result.setRemark1(null);
+//					result.setRemark2(null);
+//					result.setResult(i + 1);
+//					result.setResultState(0);
+//					result.setRoundNo(i + 1);
+//					result.setRoundResultID(null);
+//					result.setStudentItemID(i + 1);
+//					result.setTestTime("2017-05-11 09:40:35");
+//					list.add(result);
+//				}
+//				mAsyncSession.runInTx(new Runnable() {
+//					@Override
+//					public void run() {
+//						DbService.roundResultDao.insertOrReplaceInTx(list);
+//						Log.i("----------", list.size() + "成绩保存完成");
+//					}
+//				});
+//			}
+//		}).start();
 
 	}
 

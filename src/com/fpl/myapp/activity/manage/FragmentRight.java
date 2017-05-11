@@ -57,19 +57,6 @@ public class FragmentRight extends Fragment {
 			getItems();
 		}
 	};
-	Runnable getStudent = new Runnable() {
-		@Override
-		public void run() {
-			HttpUtil.getStudentInfo(context);
-		}
-	};
-	// Runnable getStudentItem = new Runnable() {
-	// @Override
-	// public void run() {
-	// HttpUtil.getStudentItemInfo(context);
-	// }
-	// };
-
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 		View view = inflater.inflate(R.layout.activity_fragment_right, container, false);
@@ -172,9 +159,6 @@ public class FragmentRight extends Fragment {
 
 		if (true == result) {
 			mHandler.post(updateItem);
-			if (DbService.getInstance(context).loadAllStudent().isEmpty()) {
-				mHandler.post(getStudent);
-			}
 		} else {
 			NetUtil.checkNetwork(getActivity());
 		}
@@ -209,6 +193,7 @@ public class FragmentRight extends Fragment {
 						nameData.add(dataList.get(i).get("name").toString());
 						Log.i("nameData=", nameData + "");
 					}
+					HttpUtil.getStudentInfo(context);
 				}
 
 				@Override
@@ -249,13 +234,6 @@ public class FragmentRight extends Fragment {
 				it.remove();
 			}
 		}
-	}
-
-	@Override
-	public void onResume() {
-		super.onResume();
-		Log.i("--", "resume");
-		getItems();
 	}
 
 	@Override

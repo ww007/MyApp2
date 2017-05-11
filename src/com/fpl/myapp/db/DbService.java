@@ -3,6 +3,7 @@ package com.fpl.myapp.db;
 import java.util.List;
 
 import android.content.Context;
+import android.database.Cursor;
 import de.greenrobot.dao.query.QueryBuilder;
 import ww.greendao.dao.Classes;
 import ww.greendao.dao.ClassesDao;
@@ -87,6 +88,11 @@ public class DbService {
 		return students;
 	}
 
+	public long getStudentsCount() {
+		QueryBuilder<Student> qb = studentDao.queryBuilder();
+		return qb.count();
+	}
+
 	public School querySchoolByName(String name) {
 		QueryBuilder<School> qb = schoolDao.queryBuilder();
 		qb.where(SchoolDao.Properties.SchoolName.eq(name));
@@ -97,6 +103,23 @@ public class DbService {
 		QueryBuilder<RoundResult> qb = roundResultDao.queryBuilder();
 		List<RoundResult> roundresults = qb.where(RoundResultDao.Properties.StudentItemID.eq(stuItemID)).list();
 		return roundresults;
+	}
+
+	public List<RoundResult> getRoundResultForPage(int page) {
+		QueryBuilder<RoundResult> qb = roundResultDao.queryBuilder();
+		List<RoundResult> roundResults = qb.offset(page * 1000).limit(1000).list();
+		return roundResults;
+	}
+
+	public List<StudentItem> getStudentItemsForPage(int page) {
+		QueryBuilder<StudentItem> qb = studentItemDao.queryBuilder();
+		List<StudentItem> studentItems = qb.offset(page * 1000).limit(1000).list();
+		return studentItems;
+	}
+
+	public long getRoundResultsCount() {
+		QueryBuilder<RoundResult> qb = roundResultDao.queryBuilder();
+		return qb.count();
 	}
 
 	public List<RoundResult> queryRoundResultByResult(int result) {
@@ -119,6 +142,11 @@ public class DbService {
 		return qb.unique();
 	}
 
+	public long getStudentItemsCount() {
+		QueryBuilder<StudentItem> qb = studentItemDao.queryBuilder();
+		return qb.count();
+	}
+
 	// public List<StudentItem> queryStudentItemByStuCode(String stuCode) {
 	// QueryBuilder<StudentItem> qb = studentItemDao.queryBuilder();
 	// List<StudentItem> studentItems =
@@ -138,9 +166,10 @@ public class DbService {
 	// return itemDao.load(id);
 	// }
 	//
-	// public RoundResult loadRoundResult(long id) {
-	// return roundResultDao.load(id);
-	// }
+	public RoundResult loadRoundResult(long id) {
+		return roundResultDao.load(id);
+	}
+
 	//
 	// public School loadSchool(long id) {
 	// return schoolDao.load(id);
@@ -150,9 +179,9 @@ public class DbService {
 	// return studentDao.load(id);
 	// }
 	//
-	// public StudentItem loadStudentItem(long id) {
-	// return studentItemDao.load(id);
-	// }
+	public StudentItem loadStudentItem(long id) {
+		return studentItemDao.load(id);
+	}
 
 	// -----------------------------------
 	public List<Classes> loadAllClasses() {

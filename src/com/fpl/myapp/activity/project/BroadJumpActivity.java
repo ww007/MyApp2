@@ -31,6 +31,8 @@ import android.view.Display;
 import android.view.KeyEvent;
 import android.view.View;
 import android.view.View.OnClickListener;
+import android.view.inputmethod.EditorInfo;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
@@ -106,27 +108,6 @@ public class BroadJumpActivity extends NFCActivity {
 		initView();
 		setListener();
 	}
-
-	// @Override
-	// protected void onResume() {
-	// orientation = ActivityInfo.SCREEN_ORIENTATION_USER;
-	// this.setRequestedOrientation(orientation);
-	// Display display = getWindowManager().getDefaultDisplay();
-	// int width = display.getWidth();
-	// int height = display.getHeight();
-	// if (width > height) {
-	// orientation = ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE;
-	// } else {
-	// orientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT;
-	// }
-	// super.onResume();
-	// }
-
-	// @Override
-	// public void onConfigurationChanged(Configuration newConfig) {
-	// super.onConfigurationChanged(newConfig);
-	// this.setRequestedOrientation(orientation);
-	// }
 
 	@Override
 	public void onNewIntent(Intent intent) {
@@ -291,6 +272,17 @@ public class BroadJumpActivity extends NFCActivity {
 	private int resultState;
 
 	private void setListener() {
+		etChengji.setOnClickListener(new OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				etChengji.setInputType(EditorInfo.TYPE_CLASS_PHONE);
+				etChengji.requestFocus();
+				InputMethodManager imm = (InputMethodManager) etChengji.getContext()
+						.getSystemService(Context.INPUT_METHOD_SERVICE);
+				imm.toggleSoftInput(0, InputMethodManager.SHOW_FORCED);
+			}
+		});
+
 		btnScan.setOnClickListener(new OnClickListener() {
 			@Override
 			public void onClick(View v) {

@@ -29,6 +29,8 @@ import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
 import android.view.View.OnClickListener;
+import android.view.inputmethod.EditorInfo;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
@@ -274,6 +276,26 @@ public class HeightAndWeightActivity extends NFCActivity {
 	}
 
 	private void setListener() {
+		etHeight.setOnClickListener(new OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				etHeight.requestFocus();
+				etHeight.setInputType(EditorInfo.TYPE_CLASS_PHONE);
+				InputMethodManager imm = (InputMethodManager) etHeight.getContext()
+						.getSystemService(Context.INPUT_METHOD_SERVICE);
+				imm.toggleSoftInput(0, InputMethodManager.SHOW_FORCED);
+			}
+		});
+		etWeight.setOnClickListener(new OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				etWeight.requestFocus();
+				etWeight.setInputType(EditorInfo.TYPE_CLASS_PHONE);
+				InputMethodManager imm = (InputMethodManager) etWeight.getContext()
+						.getSystemService(Context.INPUT_METHOD_SERVICE);
+				imm.toggleSoftInput(0, InputMethodManager.SHOW_FORCED);
+			}
+		});
 		btnScan.setOnClickListener(new OnClickListener() {
 			@Override
 			public void onClick(View v) {

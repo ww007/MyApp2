@@ -28,6 +28,8 @@ import android.text.TextWatcher;
 import android.view.KeyEvent;
 import android.view.View;
 import android.view.View.OnClickListener;
+import android.view.inputmethod.EditorInfo;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
@@ -265,6 +267,16 @@ public class VolleyballActivity extends NFCActivity {
 	private String checkedBtn = "Õý³£";
 
 	private void setListener() {
+		etChengji.setOnClickListener(new OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				etChengji.requestFocus();
+				etChengji.setInputType(EditorInfo.TYPE_CLASS_PHONE);
+				InputMethodManager imm = (InputMethodManager) etChengji.getContext()
+						.getSystemService(Context.INPUT_METHOD_SERVICE);
+				imm.toggleSoftInput(0, InputMethodManager.SHOW_FORCED);
+			}
+		});
 		btnScan.setOnClickListener(new OnClickListener() {
 			@Override
 			public void onClick(View v) {
@@ -353,7 +365,8 @@ public class VolleyballActivity extends NFCActivity {
 					// long stuID =
 					// DbService.getInstance(context).queryStudentByCode(tvNumber.getText().toString()).get(0)
 					// .getStudentID();
-					// long itemID = DbService.getInstance(context).queryItemByCode(itemCode).getItemID();
+					// long itemID =
+					// DbService.getInstance(context).queryItemByCode(itemCode).getItemID();
 					studentItems = DbService.getInstance(context).queryStudentItemByCode(tvNumber.getText().toString(),
 							itemCode);
 					if (studentItems == null) {

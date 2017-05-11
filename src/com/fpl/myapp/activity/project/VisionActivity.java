@@ -28,6 +28,8 @@ import android.text.TextWatcher;
 import android.view.KeyEvent;
 import android.view.View;
 import android.view.View.OnClickListener;
+import android.view.inputmethod.EditorInfo;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
@@ -269,6 +271,26 @@ public class VisionActivity extends NFCActivity {
 	}
 
 	private void setListener() {
+		etLeft.setOnClickListener(new OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				etLeft.requestFocus();
+				etLeft.setInputType(EditorInfo.TYPE_CLASS_PHONE);
+				InputMethodManager imm = (InputMethodManager) etLeft.getContext()
+						.getSystemService(Context.INPUT_METHOD_SERVICE);
+				imm.toggleSoftInput(0, InputMethodManager.SHOW_FORCED);
+			}
+		});
+		etRight.setOnClickListener(new OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				etRight.requestFocus();
+				etRight.setInputType(EditorInfo.TYPE_CLASS_PHONE);
+				InputMethodManager imm = (InputMethodManager) etRight.getContext()
+						.getSystemService(Context.INPUT_METHOD_SERVICE);
+				imm.toggleSoftInput(0, InputMethodManager.SHOW_FORCED);
+			}
+		});
 		btnScan.setOnClickListener(new OnClickListener() {
 			@Override
 			public void onClick(View v) {

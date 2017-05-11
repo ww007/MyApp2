@@ -182,8 +182,6 @@ public class SaveDBUtil {
 	 * @param j
 	 * @param totalPage
 	 */
-	private static ArrayList<RoundResult> mRoundResults;
-
 	public static void saveStudentItemDB(final List<PH_StudentItem> studentItems, final Context context,
 			final int totalPage, final int currentPage) {
 		new Thread(new Runnable() {
@@ -191,22 +189,14 @@ public class SaveDBUtil {
 			@Override
 			public void run() {
 				mStudentItems = new ArrayList<>();
-				mRoundResults = new ArrayList<RoundResult>();
-				int i = 0;
 				for (PH_StudentItem stuItem : studentItems) {
-					i++;
 					String itemCode = stuItem.getItemCode();
 					String studentCode = stuItem.getStudentCode();
 					StudentItem studentItem = new StudentItem(null, studentCode, itemCode, null, 0, null, 0, null, null,
 							null);
-					RoundResult roundResult = new RoundResult(null, i, studentCode, itemCode, i, 1,
-							"2017-05-10 16:50:59", 0, 0, "359261051106776", null, null);
 					mStudentItems.add(studentItem);
-					mRoundResults.add(roundResult);
 				}
-				
-				DbService.roundResultDao.insertOrReplaceInTx(mRoundResults);
-				
+
 				mAsyncSession.runInTx(new Runnable() {
 					@Override
 					public void run() {
