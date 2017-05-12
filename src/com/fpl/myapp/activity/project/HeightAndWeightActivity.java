@@ -162,18 +162,22 @@ public class HeightAndWeightActivity extends NFCActivity {
 			int hResult1 = (int) (Double.parseDouble(etHeight.getText().toString()) * 10);
 			int wResult1 = (int) (Double.parseDouble(etWeight.getText().toString()) * 1000);
 			IItemService itemService = new NFCItemServiceImpl(intent);
-			IC_Result[] HWresult = new IC_Result[4];
-			HWresult[0] = new IC_Result(hResult1, 1, 0, 0);// 身高1
-			// HWresult[1] = new IC_Result(1710, 1, 0, 0);// 身高2
-			HWresult[2] = new IC_Result(wResult1, 1, 0, 0);// 体重1
-			IC_ItemResult HWItemResult = new IC_ItemResult(Constant.HEIGHT_WEIGHT, 0, 0, HWresult);
-			boolean isHWResult = itemService.IC_WriteItemResult(HWItemResult);
-			log.info("写入身高体重=>" + isHWResult + "身高：" + hResult1 + "体重：" + wResult1 + "，学生：" + student.toString());
-			if (isHWResult) {
-				tvShow1.setText("写卡完成");
-				tvShow.setText("请刷卡");
+			if (itemService.IC_ReadStuInfo().getStuCode().equals(tvNumber.getText().toString())) {
+				IC_Result[] HWresult = new IC_Result[4];
+				HWresult[0] = new IC_Result(hResult1, 1, 0, 0);// 身高1
+				// HWresult[1] = new IC_Result(1710, 1, 0, 0);// 身高2
+				HWresult[2] = new IC_Result(wResult1, 1, 0, 0);// 体重1
+				IC_ItemResult HWItemResult = new IC_ItemResult(Constant.HEIGHT_WEIGHT, 0, 0, HWresult);
+				boolean isHWResult = itemService.IC_WriteItemResult(HWItemResult);
+				log.info("写入身高体重=>" + isHWResult + "身高：" + hResult1 + "体重：" + wResult1 + "，学生：" + student.toString());
+				if (isHWResult) {
+					tvShow1.setText("写卡完成");
+					tvShow.setText("请刷卡");
+				} else {
+					Toast.makeText(this, "写卡出错", Toast.LENGTH_SHORT).show();
+				}
 			} else {
-				Toast.makeText(this, "写卡出错", Toast.LENGTH_SHORT).show();
+				NetUtil.showToast(context, "写卡失败，此卡非当前记录");
 			}
 		} catch (Exception e) {
 			log.error("身高体重写卡失败");

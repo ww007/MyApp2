@@ -57,6 +57,13 @@ public class FragmentRight extends Fragment {
 			getItems();
 		}
 	};
+	Runnable showView = new Runnable() {
+		@Override
+		public void run() {
+			NetUtil.showToast(context, "服务器连接异常");
+		}
+	};
+
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 		View view = inflater.inflate(R.layout.activity_fragment_right, container, false);
@@ -199,11 +206,11 @@ public class FragmentRight extends Fragment {
 				@Override
 				public void onError(Exception e) {
 					Log.i("error", "数据下载失败");
-					NetUtil.showToast(context, "数据下载失败");
 				}
 			});
 		} catch (Exception e) {
-			NetUtil.showToast(context, "连接服务器异常");
+			Log.i("error", "连接服务器异常");
+			mHandler.post(showView);
 		}
 	}
 

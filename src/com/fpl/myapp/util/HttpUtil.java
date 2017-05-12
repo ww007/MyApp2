@@ -242,6 +242,7 @@ public class HttpUtil {
 						if (currentStudent.getTotalCount() == DbService.getInstance(context).getStudentsCount()) {
 							Log.i("------------", DbService.getInstance(context).getStudentsCount() + "学生信息已存在");
 							HttpUtil.getStudentItemInfo(context);
+							return;
 						} else {
 							List<PH_Student> currentResult = currentStudent.getResult();
 							Log.i("student当前页", currentStudent.getPageNo() + "");

@@ -70,6 +70,7 @@ public class SystemManagementActivity extends Activity {
 					startActivity(new Intent(android.provider.Settings.ACTION_INTERNAL_STORAGE_SETTINGS));
 					break;
 				case 5:
+					startActivity(new Intent(SystemManagementActivity.this, AbountSelfActivity.class));
 					break;
 				default:
 					break;

@@ -21,6 +21,7 @@ import com.wnb.android.nfc.dataobject.service.impl.NFCItemServiceImpl;
 import android.app.Activity;
 import android.app.Instrumentation;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.telephony.TelephonyManager;
 import android.util.Log;
@@ -33,7 +34,7 @@ import ww.greendao.dao.RoundResult;
 import android.widget.AdapterView.OnItemClickListener;
 import de.greenrobot.dao.async.AsyncSession;
 
-public class MainActivity extends NFCActivity {
+public class MainActivity extends Activity {
 	private int[] icon = { R.drawable.main_projects_selector, R.drawable.main_online_selector,
 			R.drawable.main_iccard_selector, R.drawable.main_manager_selector, R.drawable.main_help_selector,
 			R.drawable.main_quit_selector };
@@ -41,7 +42,6 @@ public class MainActivity extends NFCActivity {
 	private GridView gvMain;
 	private ArrayList<Map<String, Object>> dataList;
 	private SimpleAdapter simAdapter;
-//	private static AsyncSession mAsyncSession = DbService.mDaoSession.startAsyncSession();
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -50,112 +50,6 @@ public class MainActivity extends NFCActivity {
 
 		initView();
 		setListeners();
-		// 获取Android机IMEI号
-		TelephonyManager tm = (TelephonyManager) this.getSystemService(TELEPHONY_SERVICE);
-		final String IMEI = tm.getDeviceId();
-//		new Thread(new Runnable() {
-//
-//			@Override
-//			public void run() {
-//				final List<RoundResult> list = new ArrayList<>();
-//				for (int i = 0; i < 160000; i++) {
-//					RoundResult result = new RoundResult();
-//					result.setMac(IMEI);
-//					result.setItemCode("2015244101");
-//					result.setStudentCode("E09");
-//					result.setIsLastResult(0);
-//					result.setRemark1(null);
-//					result.setRemark2(null);
-//					result.setResult(i + 1);
-//					result.setResultState(0);
-//					result.setRoundNo(i + 1);
-//					result.setRoundResultID(null);
-//					result.setStudentItemID(i + 1);
-//					result.setTestTime("2017-05-11 09:40:35");
-//					list.add(result);
-//				}
-//				mAsyncSession.runInTx(new Runnable() {
-//					@Override
-//					public void run() {
-//						DbService.roundResultDao.insertOrReplaceInTx(list);
-//						Log.i("----------", list.size() + "成绩保存完成");
-//					}
-//				});
-//			}
-//		}).start();
-
-	}
-
-	// @Override
-	// public void onNewIntent(Intent intent) {
-	// initICCard(intent);
-	// }
-
-	/**
-	 * 初始化IC卡
-	 * 
-	 * @param intent
-	 */
-	private void initICCard(Intent intent) {
-		try {
-			IItemService service = new NFCItemServiceImpl(intent);
-			initProject(service);
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-
-	}
-
-	/**
-	 * 初始化项目信息
-	 * 
-	 * @param service
-	 */
-	private void initProject(IItemService service) {
-
-		try {
-			Student student = new Student("L4403052004011421F8", "许星辰", 1, 6, 16, "2017-02-16");
-			boolean isStu = service.IC_WriteStuInfo(student);
-			Log.i("StudentTest===========", isStu + "");
-
-			List<ItemProperty> itemProperties = new ArrayList<ItemProperty>();
-			ItemProperty itemHW = new ItemProperty(1, 0, 0, 0, 0);
-			itemProperties.add(itemHW);
-			ItemProperty itemFHL = new ItemProperty(2, 0, 0, 0, 0);
-			itemProperties.add(itemFHL);
-			ItemProperty itemLDTY = new ItemProperty(3, 0, 0, 0, 0);
-			itemProperties.add(itemLDTY);
-			ItemProperty itemMG = new ItemProperty(4, 0, 0, 0, 0);
-			itemProperties.add(itemMG);
-			ItemProperty itemFWC = new ItemProperty(5, 0, 0, 0, 0);
-			itemProperties.add(itemFWC);
-			ItemProperty itemYWQZ = new ItemProperty(6, 0, 0, 0, 0);
-			itemProperties.add(itemYWQZ);
-			ItemProperty itemZWTQQ = new ItemProperty(7, 0, 0, 0, 0);
-			itemProperties.add(itemZWTQQ);
-			ItemProperty itemTS = new ItemProperty(8, 0, 0, 0, 0);
-			itemProperties.add(itemTS);
-			ItemProperty itemSL = new ItemProperty(9, 0, 0, 0, 0);
-			itemProperties.add(itemSL);
-			ItemProperty itemYTXS = new ItemProperty(10, 0, 0, 0, 0);
-			itemProperties.add(itemYTXS);
-			ItemProperty itemHWSXQ = new ItemProperty(11, 0, 0, 0, 0);
-			itemProperties.add(itemHWSXQ);
-			ItemProperty itemZCP = new ItemProperty(12, 0, 0, 0, 0);
-			itemProperties.add(itemZCP);
-			ItemProperty itemPQ = new ItemProperty(13, 0, 0, 0, 0);
-			itemProperties.add(itemPQ);
-			ItemProperty itemLQYQ = new ItemProperty(14, 0, 0, 0, 0);
-			itemProperties.add(itemLQYQ);
-			ItemProperty itemZFP = new ItemProperty(15, 0, 0, 0, 0);
-			itemProperties.add(itemZFP);
-			ItemProperty item50M = new ItemProperty(18, 0, 0, 0, 0);
-			itemProperties.add(item50M);
-			boolean isProperty = service.IC_WriteProperty(itemProperties);
-			Log.i("WpropertyTest==========", isProperty + "");
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
 
 	}
 

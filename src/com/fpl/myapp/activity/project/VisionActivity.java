@@ -135,17 +135,21 @@ public class VisionActivity extends NFCActivity {
 			int hResult1 = Integer.parseInt(etLeft.getText().toString());
 			int wResult1 = Integer.parseInt(etRight.getText().toString());
 			IItemService itemService = new NFCItemServiceImpl(intent);
-			IC_Result[] HWresult = new IC_Result[4];
-			HWresult[0] = new IC_Result(hResult1, 1, 0, 0);// 左眼视力
-			HWresult[2] = new IC_Result(wResult1, 1, 0, 0);// 右眼视力
-			IC_ItemResult HWItemResult = new IC_ItemResult(Constant.VISION, 0, 0, HWresult);
-			boolean isHWResult = itemService.IC_WriteItemResult(HWItemResult);
-			log.info("写入视力成绩=>" + isHWResult + "左眼：" + hResult1 + "，右眼：" + wResult1 + "，学生：" + student.toString());
-			if (isHWResult) {
-				tvShow1.setText("成绩写卡完成");
-				tvShow.setText("请刷卡");
+			if (itemService.IC_ReadStuInfo().getStuCode().equals(tvNumber.getText().toString())) {
+				IC_Result[] HWresult = new IC_Result[4];
+				HWresult[0] = new IC_Result(hResult1, 1, 0, 0);// 左眼视力
+				HWresult[2] = new IC_Result(wResult1, 1, 0, 0);// 右眼视力
+				IC_ItemResult HWItemResult = new IC_ItemResult(Constant.VISION, 0, 0, HWresult);
+				boolean isHWResult = itemService.IC_WriteItemResult(HWItemResult);
+				log.info("写入视力成绩=>" + isHWResult + "左眼：" + hResult1 + "，右眼：" + wResult1 + "，学生：" + student.toString());
+				if (isHWResult) {
+					tvShow1.setText("成绩写卡完成");
+					tvShow.setText("请刷卡");
+				} else {
+					Toast.makeText(this, "写卡出错", Toast.LENGTH_SHORT).show();
+				}
 			} else {
-				Toast.makeText(this, "写卡出错", Toast.LENGTH_SHORT).show();
+				NetUtil.showToast(context, "写卡失败，此卡非当前记录");
 			}
 		} catch (Exception e) {
 			log.error("视力写卡失败");

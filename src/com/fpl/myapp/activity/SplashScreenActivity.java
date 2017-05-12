@@ -15,6 +15,8 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.util.Log;
+import android.view.View;
+import android.widget.ProgressBar;
 import android.widget.Toast;
 import de.greenrobot.dao.async.AsyncSession;
 
@@ -24,9 +26,10 @@ import de.greenrobot.dao.async.AsyncSession;
  */
 public class SplashScreenActivity extends Activity {
 
-	private int SPLASH_TIME_OUT = 2000;
-	private Handler mHandle = new Handler();;
+	private static Handler mHandle = new Handler();;
 	private Context context;
+	private int SPLASH_TIME_OUT = 2000;
+	public static ProgressBar pbSplash;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -34,43 +37,53 @@ public class SplashScreenActivity extends Activity {
 		setContentView(R.layout.activity_splash_screen);
 		context = this;
 
+		pbSplash = (ProgressBar) findViewById(R.id.pb_splash);
 		// 调用NetUtil中的网络判断方法
 		boolean result = NetUtil.netState(context);
 		isWifiConnected(result);
 
 	}
 
+	// 运行在主线程的Handler,它将监听所有的消息（Message）
+
 	private void isWifiConnected(boolean result) {
 		if (true == result) {
-			if (DbService.getInstance(context).getStudentItemsCount()==0) {
+			if (DbService.getInstance(context).getStudentItemsCount() == 0) {
+//				pbSplash.setVisibility(View.VISIBLE);
 				HttpUtil.getItemInfo(context);
 				if (HttpUtil.okFlag == 3000) {
 					SPLASH_TIME_OUT = 2000;
 				} else {
-					SPLASH_TIME_OUT = 30000;
+					SPLASH_TIME_OUT = 60000;
 				}
-			} else {
-				SPLASH_TIME_OUT = 2000;
 			}
-			handlePost();
+			handlePost(SPLASH_TIME_OUT);
 		} else {
 			if (DbService.getInstance(context).loadAllItem().isEmpty()) {
 				Toast.makeText(context, "提示：当前未连接网路，相关数据下载失败", Toast.LENGTH_SHORT).show();
 			}
-			handlePost();
+			handlePost(2000);
 		}
 
 	}
 
-	private void handlePost() {
+	public static void handleUI(final int progress) {
+		mHandle.post(new Runnable() {
+			@Override
+			public void run() {
+				pbSplash.setProgress(progress);
+			}
+		});
+	}
+
+	private void handlePost(int time) {
 		mHandle.postDelayed(new Runnable() {
 			@Override
 			public void run() {
-				Intent i = new Intent(SplashScreenActivity.this, MainActivity.class);
-				startActivity(i);
+				startActivity(new Intent(SplashScreenActivity.this, MainActivity.class));
 				finish();
 			}
-		}, SPLASH_TIME_OUT);
+		}, time);
 	}
 
 }

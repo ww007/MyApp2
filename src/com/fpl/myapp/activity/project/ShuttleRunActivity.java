@@ -93,7 +93,7 @@ public class ShuttleRunActivity extends NFCActivity {
 		btnScan = (Button) findViewById(R.id.btn_run_scanCode);
 		tvTitle = (TextView) findViewById(R.id.tv_title_run);
 		tv = (TextView) findViewById(R.id.tv_run);
-		tvTitle.setText("50Ã×ÅÜ");
+		tvTitle.setText("50Ã×x8Íù·µÅÜ");
 		btnStart = (Button) findViewById(R.id.btn_start);
 		btnQuit = (Button) findViewById(R.id.btn_quit);
 

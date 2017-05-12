@@ -128,24 +128,27 @@ public class SitAndReachActivity extends NFCActivity {
 	private void writeCard(Intent intent) {
 		try {
 			IItemService itemService = new NFCItemServiceImpl(intent);
-
-			IC_Result[] resultSitReach = new IC_Result[4];
-			String chengji = "";
-			if (checkedBtn.equals("犯规") || checkedBtn.equals("弃权")) {
-				chengji = "0";
+			if (itemService.IC_ReadStuInfo().getStuCode().equals(tvNumber.getText().toString())) {
+				IC_Result[] resultSitReach = new IC_Result[4];
+				String chengji = "";
+				if (checkedBtn.equals("犯规") || checkedBtn.equals("弃权")) {
+					chengji = "0";
+				} else {
+					chengji = etChengji.getText().toString();
+				}
+				int result1 = Integer.parseInt(chengji);
+				resultSitReach[0] = new IC_Result(result1, 1, 0, 0);
+				IC_ItemResult ItemResultSitReach = new IC_ItemResult(Constant.SIT_AND_REACH, 0, 0, resultSitReach);
+				boolean isSitReachResult = itemService.IC_WriteItemResult(ItemResultSitReach);
+				log.info("写入坐位体前屈成绩=>" + isSitReachResult + "成绩：" + result1 + "，学生：" + student.toString());
+				if (isSitReachResult) {
+					tvShow1.setText("成绩写卡完成");
+					tvShow.setText("请刷卡");
+				} else {
+					Toast.makeText(this, "写卡出错", Toast.LENGTH_SHORT).show();
+				}
 			} else {
-				chengji = etChengji.getText().toString();
-			}
-			int result1 = Integer.parseInt(chengji);
-			resultSitReach[0] = new IC_Result(result1, 1, 0, 0);
-			IC_ItemResult ItemResultSitReach = new IC_ItemResult(Constant.SIT_AND_REACH, 0, 0, resultSitReach);
-			boolean isSitReachResult = itemService.IC_WriteItemResult(ItemResultSitReach);
-			log.info("写入坐位体前屈成绩=>" + isSitReachResult + "成绩：" + result1 + "，学生：" + student.toString());
-			if (isSitReachResult) {
-				tvShow1.setText("成绩写卡完成");
-				tvShow.setText("请刷卡");
-			} else {
-				Toast.makeText(this, "写卡出错", Toast.LENGTH_SHORT).show();
+				NetUtil.showToast(context, "写卡失败，此卡非当前记录");
 			}
 		} catch (Exception e) {
 			log.error("坐位体前屈写卡失败");

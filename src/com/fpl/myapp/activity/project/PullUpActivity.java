@@ -129,24 +129,27 @@ public class PullUpActivity extends NFCActivity {
 	private void writeCard(Intent intent) {
 		try {
 			IItemService itemService = new NFCItemServiceImpl(intent);
-
-			IC_Result[] resultPullUp = new IC_Result[4];
-			String chengji = "";
-			if (checkedBtn.equals("犯规") || checkedBtn.equals("免跳") || checkedBtn.equals("退出")) {
-				chengji = "0";
+			if (itemService.IC_ReadStuInfo().getStuCode().equals(tvNumber.getText().toString())) {
+				IC_Result[] resultPullUp = new IC_Result[4];
+				String chengji = "";
+				if (checkedBtn.equals("犯规") || checkedBtn.equals("免跳") || checkedBtn.equals("退出")) {
+					chengji = "0";
+				} else {
+					chengji = etChengji.getText().toString();
+				}
+				int result1 = Integer.parseInt(chengji);
+				resultPullUp[0] = new IC_Result(result1, 1, 0, 0);
+				IC_ItemResult ItemResultPullUp = new IC_ItemResult(Constant.PULL_UP, 0, 0, resultPullUp);
+				boolean isPullUpResult = itemService.IC_WriteItemResult(ItemResultPullUp);
+				log.info("写入引体向上成绩=>" + isPullUpResult + "成绩：" + result1 + "，学生：" + student.toString());
+				if (isPullUpResult) {
+					tvShow1.setText("成绩写卡完成");
+					tvShow.setText("请刷卡");
+				} else {
+					Toast.makeText(this, "写卡出错", Toast.LENGTH_SHORT).show();
+				}
 			} else {
-				chengji = etChengji.getText().toString();
-			}
-			int result1 = Integer.parseInt(chengji);
-			resultPullUp[0] = new IC_Result(result1, 1, 0, 0);
-			IC_ItemResult ItemResultPullUp = new IC_ItemResult(Constant.PULL_UP, 0, 0, resultPullUp);
-			boolean isPullUpResult = itemService.IC_WriteItemResult(ItemResultPullUp);
-			log.info("写入引体向上成绩=>" + isPullUpResult + "成绩：" + result1 + "，学生：" + student.toString());
-			if (isPullUpResult) {
-				tvShow1.setText("成绩写卡完成");
-				tvShow.setText("请刷卡");
-			} else {
-				Toast.makeText(this, "写卡出错", Toast.LENGTH_SHORT).show();
+				NetUtil.showToast(context, "写卡失败，此卡非当前记录");
 			}
 		} catch (Exception e) {
 			log.error("引体向上写卡失败");

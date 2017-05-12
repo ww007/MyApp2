@@ -127,24 +127,27 @@ public class VolleyballActivity extends NFCActivity {
 	private void writeCard(Intent intent) {
 		try {
 			IItemService itemService = new NFCItemServiceImpl(intent);
-
-			IC_Result[] resultVolleyball = new IC_Result[4];
-			String chengji = "";
-			if (checkedBtn.equals("犯规") || checkedBtn.equals("弃权")) {
-				chengji = "0";
+			if (itemService.IC_ReadStuInfo().getStuCode().equals(tvNumber.getText().toString())) {
+				IC_Result[] resultVolleyball = new IC_Result[4];
+				String chengji = "";
+				if (checkedBtn.equals("犯规") || checkedBtn.equals("弃权")) {
+					chengji = "0";
+				} else {
+					chengji = etChengji.getText().toString();
+				}
+				int result1 = Integer.parseInt(chengji);
+				resultVolleyball[0] = new IC_Result(result1, 1, 0, 0);
+				IC_ItemResult ItemResultVolleyball = new IC_ItemResult(Constant.VOLLEYBALL, 0, 0, resultVolleyball);
+				boolean isVolleyballResult = itemService.IC_WriteItemResult(ItemResultVolleyball);
+				log.info("写入排球成绩=>" + isVolleyballResult + "成绩：" + result1 + "，学生：" + student.toString());
+				if (isVolleyballResult) {
+					tvShow1.setText("成绩写卡完成");
+					tvShow.setText("请刷卡");
+				} else {
+					Toast.makeText(this, "写卡出错", Toast.LENGTH_SHORT).show();
+				}
 			} else {
-				chengji = etChengji.getText().toString();
-			}
-			int result1 = Integer.parseInt(chengji);
-			resultVolleyball[0] = new IC_Result(result1, 1, 0, 0);
-			IC_ItemResult ItemResultVolleyball = new IC_ItemResult(Constant.VOLLEYBALL, 0, 0, resultVolleyball);
-			boolean isVolleyballResult = itemService.IC_WriteItemResult(ItemResultVolleyball);
-			log.info("写入排球成绩=>" + isVolleyballResult + "成绩：" + result1 + "，学生：" + student.toString());
-			if (isVolleyballResult) {
-				tvShow1.setText("成绩写卡完成");
-				tvShow.setText("请刷卡");
-			} else {
-				Toast.makeText(this, "写卡出错", Toast.LENGTH_SHORT).show();
+				NetUtil.showToast(context, "写卡失败，此卡非当前记录");
 			}
 		} catch (Exception e) {
 			log.error("排球写卡失败");

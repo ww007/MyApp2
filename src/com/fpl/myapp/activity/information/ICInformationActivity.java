@@ -40,54 +40,43 @@ public class ICInformationActivity extends NFCActivity {
 	private TextView tvGender;
 	private ListView lvIcInfo;
 	private TextView tvShow;
-	// private SharedPreferences sharedPreferences;
 
 	public ArrayList<String> projects = new ArrayList<>();
-	// private String[] newProject;
-	// private String[] newValue;
-	// private int number50, numberH, numberW, numberFHL, numberLDTY,
-	// numberYWQZ, number800, number1000, numberFWC,
-	// numberZWTQQ, numberTS, numberLSL, numberRSL, numberYTXS, numberMG,
-	// numberPQ, numberHWSXQ, numberLQYQ,
-	// numberZFP, numberTJZ, numberZQYQ, numberYY;
-	private List<Item> items;
 	private ImageButton ibQuit;
 	private Logger log = Logger.getLogger(ICInformationActivity.class);
 
-	Handler mHandler = new Handler();
-	Runnable updateTv1 = new Runnable() {
-		@Override
-		public void run() {
-			tvShow.setText("读取中...");
-		}
-	};
-	Runnable updateTv2 = new Runnable() {
-		@Override
-		public void run() {
-			tvShow.setText("读取完毕!");
-		}
+	Handler mHandler = new Handler() {
+		public void handleMessage(android.os.Message msg) {
+			switch (msg.what) {
+			case 1:
+				tvShow.setText("读取中...");
+				break;
+			case 2:
+				tvShow.setText("读取完毕");
+				break;
+			case 3:
+				tvShow.setText("读取中断，获取部分数据");
+				break;
+
+			default:
+				break;
+			}
+		};
 	};
 	private ICInfo icInfo1;
+	private List<ItemProperty> properties;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_icinformation);
-		// 读取本地存储的选中项目
-		// sharedPreferences = getSharedPreferences("projects",
-		// Activity.MODE_PRIVATE);
-		// int selected = sharedPreferences.getInt("size", 0);
-		// Log.i("selected=", selected + "");
-
 		icInfo1 = new ICInfo();
-
 		initView();
 		setListener();
 	}
 
 	@Override
 	public void onNewIntent(final Intent intent) {
-		tvShow.setText("读取中断，请重新刷卡！");
 		readCard(intent);
 
 	}
@@ -97,7 +86,8 @@ public class ICInformationActivity extends NFCActivity {
 		try {
 			icInfos.clear();
 			itemService = new NFCItemServiceImpl(intent);
-			List<ItemProperty> properties = itemService.IC_ReadAllProperties();
+			properties = itemService.IC_ReadAllProperties();
+			mHandler.sendEmptyMessage(1);
 			Log.i("properties==", properties.toString());
 			Student student = itemService.IC_ReadStuInfo();
 			Log.i("StudentTest===", student.toString());
@@ -194,6 +184,7 @@ public class ICInformationActivity extends NFCActivity {
 		ICInfo icInfo = new ICInfo();
 		try {
 			itemResult = itemService.IC_ReadItemResult(code);
+			mHandler.sendEmptyMessage(1);
 			Log.d(name + "：", itemResult.toString());
 			if (itemResult.getResult()[0].getResultFlag() != 1) {
 				Log.i(code + "", name + "没有成绩");
@@ -214,7 +205,11 @@ public class ICInformationActivity extends NFCActivity {
 
 	private void updateView() {
 		// 获取数据
-		mHandler.post(updateTv2);
+		if (icInfos.size() < properties.size()) {
+			mHandler.sendEmptyMessage(3);
+		} else {
+			mHandler.sendEmptyMessage(2);
+		}
 		mAdapter = new ICInfoAdapter(this, icInfos);
 		Log.i("icInfos", icInfos + "");
 		lvIcInfo.setAdapter(mAdapter);
@@ -233,6 +228,7 @@ public class ICInformationActivity extends NFCActivity {
 		ICInfo icInfo = new ICInfo();
 		try {
 			itemResultVision = itemService.IC_ReadItemResult(Constant.VISION);
+			mHandler.sendEmptyMessage(1);
 			if (itemResultVision.getResult()[0].getResultFlag() != 1) {
 				Log.i("", "视力没有数据");
 				icInfo.setProjectTitle("左眼视力");
@@ -269,6 +265,7 @@ public class ICInformationActivity extends NFCActivity {
 		ICInfo icInfo = new ICInfo();
 		try {
 			itemResultMiddleRace = itemService.IC_ReadItemResult(Constant.MIDDLE_RACE);
+			mHandler.sendEmptyMessage(1);
 			Log.i("读取中长跑测试", itemResultMiddleRace.toString());
 			if (sex.equals("女")) {
 				if (itemResultMiddleRace.getResult()[0].getResultFlag() != 1) {
@@ -307,11 +304,11 @@ public class ICInformationActivity extends NFCActivity {
 	 */
 	private void readHW(IItemService itemService) {
 		// 读取身高体重
-
 		IC_ItemResult itemResultHW;
 		ICInfo icInfo = new ICInfo();
 		try {
 			itemResultHW = itemService.IC_ReadItemResult(Constant.HEIGHT_WEIGHT);
+			mHandler.sendEmptyMessage(1);
 			Log.i("读取身高体重测试", itemResultHW.toString());
 			if (itemResultHW.getResult()[0].getResultFlag() != 1) {
 				Log.i("", "身高体重没有数据");

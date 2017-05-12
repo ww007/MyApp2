@@ -81,6 +81,11 @@ public class DbService {
 		qb.where(ItemDao.Properties.MachineCode.eq(code));
 		return qb.unique();
 	}
+	public List<Item> queryItemByMachineCodeList(String code) {
+		QueryBuilder<Item> qb = itemDao.queryBuilder();
+		qb.where(ItemDao.Properties.MachineCode.eq(code));
+		return qb.list();
+	}
 
 	public List<Student> queryStudentByCode(String code) {
 		QueryBuilder<Student> qb = studentDao.queryBuilder();

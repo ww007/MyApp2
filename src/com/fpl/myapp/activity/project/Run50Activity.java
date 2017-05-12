@@ -121,9 +121,13 @@ public class Run50Activity extends NFCActivity {
 
 			@Override
 			public void onClick(View v) {
-				Intent intent = new Intent(Run50Activity.this, RunMeteringActivity.class);
-				intent.putExtra("title", tvTitle.getText().toString());
-				startActivity(intent);
+				if (readStyle == 0) {
+					Intent intent = new Intent(Run50Activity.this, RunMeteringActivity.class);
+					intent.putExtra("title", tvTitle.getText().toString());
+					startActivity(intent);
+				} else {
+					NetUtil.showToast(context, "当前为扫码模式");
+				}
 			}
 		});
 

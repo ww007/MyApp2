@@ -129,24 +129,27 @@ public class PushUpActivity extends NFCActivity {
 	private void writeCard(Intent intent) {
 		try {
 			IItemService itemService = new NFCItemServiceImpl(intent);
-
-			IC_Result[] resultPushUp = new IC_Result[4];
-			String chengji = "";
-			if (checkedBtn.equals("犯规") || checkedBtn.equals("免跳") || checkedBtn.equals("退出")) {
-				chengji = "0";
+			if (itemService.IC_ReadStuInfo().getStuCode().equals(tvNumber.getText().toString())) {
+				IC_Result[] resultPushUp = new IC_Result[4];
+				String chengji = "";
+				if (checkedBtn.equals("犯规") || checkedBtn.equals("免跳") || checkedBtn.equals("退出")) {
+					chengji = "0";
+				} else {
+					chengji = etChengji.getText().toString();
+				}
+				int result1 = Integer.parseInt(chengji);
+				resultPushUp[0] = new IC_Result(result1, 1, 0, 0);
+				IC_ItemResult ItemResultPushUp = new IC_ItemResult(Constant.PUSH_UP, 0, 0, resultPushUp);
+				boolean isPushUpResult = itemService.IC_WriteItemResult(ItemResultPushUp);
+				log.info("写入俯卧撑成绩=>" + isPushUpResult + "成绩：" + result1 + "，学生：" + student.toString());
+				if (isPushUpResult) {
+					tvShow1.setText("成绩写卡完成");
+					tvShow.setText("请刷卡");
+				} else {
+					Toast.makeText(this, "写卡出错", Toast.LENGTH_SHORT).show();
+				}
 			} else {
-				chengji = etChengji.getText().toString();
-			}
-			int result1 = Integer.parseInt(chengji);
-			resultPushUp[0] = new IC_Result(result1, 1, 0, 0);
-			IC_ItemResult ItemResultPushUp = new IC_ItemResult(Constant.PUSH_UP, 0, 0, resultPushUp);
-			boolean isPushUpResult = itemService.IC_WriteItemResult(ItemResultPushUp);
-			log.info("写入俯卧撑成绩=>" + isPushUpResult + "成绩：" + result1 + "，学生：" + student.toString());
-			if (isPushUpResult) {
-				tvShow1.setText("成绩写卡完成");
-				tvShow.setText("请刷卡");
-			} else {
-				Toast.makeText(this, "写卡出错", Toast.LENGTH_SHORT).show();
+				NetUtil.showToast(context, "写卡失败，此卡非当前记录");
 			}
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
@@ -279,7 +282,7 @@ public class PushUpActivity extends NFCActivity {
 				imm.toggleSoftInput(0, InputMethodManager.SHOW_FORCED);
 			}
 		});
-		
+
 		btnScan.setOnClickListener(new OnClickListener() {
 			@Override
 			public void onClick(View v) {

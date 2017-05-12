@@ -214,7 +214,7 @@
 
                 <category android:name="android.intent.category.HOME" />
             </intent-filter>
-        </receiver>
+        </receiver>
         -->
         <activity
             android:name="com.fpl.myapp.activity.manage.ProjectManagerActivity"
@@ -229,6 +229,10 @@
         <activity
             android:name="com.fpl.myapp.activity.manage.SharedpreferencesActivity"
             android:label="@string/title_activity_sharedpreferences" >
+        </activity>
+        <activity
+            android:name="com.fpl.myapp.activity.manage.AbountSelfActivity"
+            android:label="@string/title_activity_abount_self" >
         </activity>
     </application>
 

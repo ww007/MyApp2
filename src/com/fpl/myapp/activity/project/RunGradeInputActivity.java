@@ -118,19 +118,23 @@ public class RunGradeInputActivity extends NFCActivity {
 
 		if (title.equals("800/1000米跑")) {
 			constant = Constant.MIDDLE_RACE;
+			items = DbService.getInstance(context).queryItemByMachineCodeList(constant + "").get(0);
 		} else if (title.equals("50米跑")) {
 			constant = Constant.RUN50;
+			items = DbService.getInstance(context).queryItemByMachineCode(constant + "");
 		} else if (title.equals("50米x8往返跑")) {
 			constant = Constant.SHUTTLE_RUN;
+			items = DbService.getInstance(context).queryItemByMachineCode(constant + "");
 		} else if (title.equals("篮球运球")) {
 			constant = Constant.BASKETBALL_SKILL;
+			items = DbService.getInstance(context).queryItemByMachineCode(constant + "");
 		} else if (title.equals("足球运球")) {
 			constant = Constant.FOOTBALL_SKILL;
+			items = DbService.getInstance(context).queryItemByMachineCode(constant + "");
 		} else if (title.equals("游泳")) {
 			constant = Constant.SWIM;
+			items = DbService.getInstance(context).queryItemByMachineCode(constant + "");
 		}
-
-		items = DbService.getInstance(context).queryItemByMachineCode(constant + "");
 
 		if (items == null) {
 			max = "";
@@ -190,25 +194,28 @@ public class RunGradeInputActivity extends NFCActivity {
 	private void writeCard(Intent intent) {
 		try {
 			IItemService itemService = new NFCItemServiceImpl(intent);
-
-			IC_Result[] resultRun = new IC_Result[4];
-			String chengji = "";
-			if ("".equals(etMs.getText().toString()) && "".equals(etS.getText().toString())
-					&& "".equals(etSec.getText().toString())) {
-				chengji = "0";
+			if (itemService.IC_ReadStuInfo().getStuCode().equals(tvNumber.getText().toString())) {
+				IC_Result[] resultRun = new IC_Result[4];
+				String chengji = "";
+				if ("".equals(etMs.getText().toString()) && "".equals(etS.getText().toString())
+						&& "".equals(etSec.getText().toString())) {
+					chengji = "0";
+				} else {
+					chengji = getChengJi() + "";
+				}
+				int result1 = Integer.parseInt(chengji);
+				resultRun[0] = new IC_Result(result1, 1, 0, 0);
+				IC_ItemResult ItemResultRun = new IC_ItemResult(constant, 0, 0, resultRun);
+				boolean isRunResult = itemService.IC_WriteItemResult(ItemResultRun);
+				log.info("写入跑步成绩=>" + isRunResult + "成绩：" + result1 + "，学生：" + tvNumber.getText().toString());
+				if (isRunResult) {
+					tvShow1.setText("成绩写卡完成");
+					tvShow.setText("请刷卡");
+				} else {
+					Toast.makeText(this, "写卡出错", Toast.LENGTH_SHORT).show();
+				}
 			} else {
-				chengji = getChengJi() + "";
-			}
-			int result1 = Integer.parseInt(chengji);
-			resultRun[0] = new IC_Result(result1, 1, 0, 0);
-			IC_ItemResult ItemResultRun = new IC_ItemResult(constant, 0, 0, resultRun);
-			boolean isRunResult = itemService.IC_WriteItemResult(ItemResultRun);
-			log.info("写入跑步成绩=>" + isRunResult + "成绩：" + result1 + "，学生：" + tvNumber.getText().toString());
-			if (isRunResult) {
-				tvShow1.setText("成绩写卡完成");
-				tvShow.setText("请刷卡");
-			} else {
-				Toast.makeText(this, "写卡出错", Toast.LENGTH_SHORT).show();
+				NetUtil.showToast(context, "写卡失败，此卡非当前记录");
 			}
 		} catch (Exception e) {
 			log.error(title + "写卡失败");

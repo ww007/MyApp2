@@ -321,6 +321,7 @@ public class OnlineActivity extends Activity {
 
 			@Override
 			public void run() {
+				ivSend.setClickable(false);
 				currentPage = page;
 				ph_RoundGrounds = new ArrayList<PH_RoundGround>();
 				OkHttpClient okHttpClient = new OkHttpClient();

@@ -24,6 +24,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.KeyEvent;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.AdapterView;
@@ -70,7 +71,7 @@ public class RunGradeActivity extends NFCActivity {
 	@Override
 	protected void onNewIntent(Intent intent) {
 		writeCard(intent);
-//		readCard(intent);
+		// readCard(intent);
 	}
 
 	/**
@@ -99,51 +100,76 @@ public class RunGradeActivity extends NFCActivity {
 
 		try {
 			Log.i("title=", title);
-			IItemService itemService = new NFCItemServiceImpl(intent);
+			final IItemService itemService = new NFCItemServiceImpl(intent);
 			student = itemService.IC_ReadStuInfo();
 			if (student == null) {
 				NetUtil.showToast(context, "此卡无效");
 				return;
 			}
-			if (title.equals("50米跑")) {
-				String time = runGrades.get(currentPosition).getTime();
-				int result1 = Integer.parseInt(time.subSequence(0, 2).toString()) * 60 * 1000
-						+ Integer.parseInt(time.subSequence(3, 5).toString()) * 1000
-						+ Integer.parseInt(time.substring(6, 9).toString());
-				log.info("50米跑写卡=>" + "成绩：" + result1 + "，学生：" + student.toString());
-				IC_Result[] result50M = new IC_Result[4];
-				result50M[0] = new IC_Result(result1, 1, 0, 0);// 成绩1
-				IC_ItemResult ItemResult50M = new IC_ItemResult(Constant.RUN50, 0, 0, result50M);
-				boolean is50MResult = itemService.IC_WriteItemResult(ItemResult50M);
-				log.info("50米跑写卡=>" + is50MResult);
-			} else if (title.equals("800/1000米跑")) {
-				String time = runGrades.get(currentPosition).getTime();
-				int result1 = Integer.parseInt(time.subSequence(0, 2).toString()) * 60 * 1000
-						+ Integer.parseInt(time.subSequence(3, 5).toString()) * 1000
-						+ Integer.parseInt(time.substring(6, 9).toString());
-				log.info("800/1000米跑写卡=>" + "成绩：" + result1 + "，学生：" + student.toString());
-				IC_Result[] resultMiddleRace = new IC_Result[4];
-				resultMiddleRace[0] = new IC_Result(result1, 1, 0, 0);// 成绩1
-				IC_ItemResult ItemResultMiddleRace = new IC_ItemResult(Constant.MIDDLE_RACE, 0, 0, resultMiddleRace);
-				boolean isMiddleRaceResult = itemService.IC_WriteItemResult(ItemResultMiddleRace);
-				log.info("800/1000米跑写卡=>" + isMiddleRaceResult);
-			} else if (title.equals("50米x8往返跑")) {
-				String time = runGrades.get(currentPosition).getTime();
-				int result1 = Integer.parseInt(time.subSequence(0, 2).toString()) * 60 * 1000
-						+ Integer.parseInt(time.subSequence(3, 5).toString()) * 1000
-						+ Integer.parseInt(time.substring(6, 9).toString());
-				log.info("50米x8往返跑写卡=>" + "成绩：" + result1 + "，学生：" + student.toString());
-				IC_Result[] resultZFP = new IC_Result[4];
-				resultZFP[0] = new IC_Result(result1, 1, 0, 0);// 成绩1
-				IC_ItemResult ItemResultZFP = new IC_ItemResult(Constant.SHUTTLE_RUN, 0, 0, resultZFP);
-				boolean isZFPResult = itemService.IC_WriteItemResult(ItemResultZFP);
-				log.info("50米x8往返跑写卡=>" + isZFPResult);
-			}
-			showView();
-
+			// else {
+			// for (final RunGrade runGrade : ChengjiAdapter.datas) {
+			// if (student.getStuCode().equals(runGrade.getStuCode())) {
+			// new
+			// AlertDialog.Builder(RunGradeActivity.this).setTitle("提示").setMessage("当前IC卡已有成绩，是否覆盖？")
+			// .setPositiveButton("否", new DialogInterface.OnClickListener() {
+			//
+			// @Override
+			// public void onClick(DialogInterface dialog, int which) {
+			// return;
+			// }
+			// }).setNegativeButton("是", new DialogInterface.OnClickListener() {
+			//
+			// @Override
+			// public void onClick(DialogInterface dialog, int which) {
+			// runGrades.get(runGrade.getXuhao() - 1).setName(null);
+			// }
+			// }).show();
+			// showView();
+			// }
+			// }
+			// }
+			readAndWrite(itemService);
 		} catch (Exception e) {
 			log.error(title + "写卡操作失败");
 		}
+	}
+
+	private void readAndWrite(IItemService itemService) throws Exception {
+		if (title.equals("50米跑")) {
+			String time = runGrades.get(currentPosition).getTime();
+			int result1 = Integer.parseInt(time.subSequence(0, 2).toString()) * 60 * 1000
+					+ Integer.parseInt(time.subSequence(3, 5).toString()) * 1000
+					+ Integer.parseInt(time.substring(6, 9).toString());
+			log.info("50米跑写卡=>" + "成绩：" + result1 + "，学生：" + student.toString());
+			IC_Result[] result50M = new IC_Result[4];
+			result50M[0] = new IC_Result(result1, 1, 0, 0);// 成绩1
+			IC_ItemResult ItemResult50M = new IC_ItemResult(Constant.RUN50, 0, 0, result50M);
+			boolean is50MResult = itemService.IC_WriteItemResult(ItemResult50M);
+			log.info("50米跑写卡=>" + is50MResult);
+		} else if (title.equals("800/1000米跑")) {
+			String time = runGrades.get(currentPosition).getTime();
+			int result1 = Integer.parseInt(time.subSequence(0, 2).toString()) * 60 * 1000
+					+ Integer.parseInt(time.subSequence(3, 5).toString()) * 1000
+					+ Integer.parseInt(time.substring(6, 9).toString());
+			log.info("800/1000米跑写卡=>" + "成绩：" + result1 + "，学生：" + student.toString());
+			IC_Result[] resultMiddleRace = new IC_Result[4];
+			resultMiddleRace[0] = new IC_Result(result1, 1, 0, 0);// 成绩1
+			IC_ItemResult ItemResultMiddleRace = new IC_ItemResult(Constant.MIDDLE_RACE, 0, 0, resultMiddleRace);
+			boolean isMiddleRaceResult = itemService.IC_WriteItemResult(ItemResultMiddleRace);
+			log.info("800/1000米跑写卡=>" + isMiddleRaceResult);
+		} else if (title.equals("50米x8往返跑")) {
+			String time = runGrades.get(currentPosition).getTime();
+			int result1 = Integer.parseInt(time.subSequence(0, 2).toString()) * 60 * 1000
+					+ Integer.parseInt(time.subSequence(3, 5).toString()) * 1000
+					+ Integer.parseInt(time.substring(6, 9).toString());
+			log.info("50米x8往返跑写卡=>" + "成绩：" + result1 + "，学生：" + student.toString());
+			IC_Result[] resultZFP = new IC_Result[4];
+			resultZFP[0] = new IC_Result(result1, 1, 0, 0);// 成绩1
+			IC_ItemResult ItemResultZFP = new IC_ItemResult(Constant.SHUTTLE_RUN, 0, 0, resultZFP);
+			boolean isZFPResult = itemService.IC_WriteItemResult(ItemResultZFP);
+			log.info("50米x8往返跑写卡=>" + isZFPResult);
+		}
+		showView();
 	}
 
 	private void showView() {
@@ -187,7 +213,7 @@ public class RunGradeActivity extends NFCActivity {
 							@Override
 							public void onClick(DialogInterface dialog, int which) {
 								datas = ChengjiAdapter.datas;
-								if (DbService.getInstance(context).loadAllItem().isEmpty()) {
+								if (DbService.getInstance(context).getStudentItemsCount() == 0) {
 									NetUtil.showToast(context, "相关数据未下载，不能保存");
 									return;
 								}
@@ -263,6 +289,33 @@ public class RunGradeActivity extends NFCActivity {
 						}).show();
 			}
 		});
+	}
+
+	@Override
+	public boolean onKeyDown(int keyCode, KeyEvent event) {
+		switch (keyCode) {
+		case KeyEvent.KEYCODE_BACK:
+			new AlertDialog.Builder(RunGradeActivity.this).setTitle("确认").setMessage("成绩未保存，是否退出？")
+					.setPositiveButton("取消", new DialogInterface.OnClickListener() {
+
+						@Override
+						public void onClick(DialogInterface dialog, int which) {
+							// TODO Auto-generated method stub
+
+						}
+					}).setNegativeButton("确定", new DialogInterface.OnClickListener() {
+
+						@Override
+						public void onClick(DialogInterface dialog, int which) {
+							finish();
+						}
+					}).show();
+			break;
+
+		default:
+			break;
+		}
+		return super.onKeyDown(keyCode, event);
 	}
 
 	/**

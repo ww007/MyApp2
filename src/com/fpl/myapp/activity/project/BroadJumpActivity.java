@@ -131,24 +131,27 @@ public class BroadJumpActivity extends NFCActivity {
 
 		try {
 			IItemService itemService = new NFCItemServiceImpl(intent);
-
-			String chengji = "";
-			IC_Result[] resultBroadJump = new IC_Result[4];
-			if (checkedBtn.equals("犯规") || checkedBtn.equals("免跳") || checkedBtn.equals("退出")) {
-				chengji = "0";
+			if (itemService.IC_ReadStuInfo().getStuCode().equals(tvNumber.getText().toString())) {
+				String chengji = "";
+				IC_Result[] resultBroadJump = new IC_Result[4];
+				if (checkedBtn.equals("犯规") || checkedBtn.equals("免跳") || checkedBtn.equals("退出")) {
+					chengji = "0";
+				} else {
+					chengji = etChengji.getText().toString();
+				}
+				int result1 = Integer.parseInt(chengji);
+				resultBroadJump[0] = new IC_Result(result1, 1, 0, 0);
+				IC_ItemResult ItemResultBroadJump = new IC_ItemResult(Constant.BROAD_JUMP, 0, 0, resultBroadJump);
+				boolean isBroadJumpResult = itemService.IC_WriteItemResult(ItemResultBroadJump);
+				log.info("写入立定跳远成绩=>" + isBroadJumpResult + "成绩：" + result1 + "，学生：" + student.toString());
+				if (isBroadJumpResult) {
+					tvShow1.setText("成绩写卡完成");
+					tvShow.setText("请刷卡");
+				} else {
+					Toast.makeText(this, "写卡出错", Toast.LENGTH_SHORT).show();
+				}
 			} else {
-				chengji = etChengji.getText().toString();
-			}
-			int result1 = Integer.parseInt(chengji);
-			resultBroadJump[0] = new IC_Result(result1, 1, 0, 0);
-			IC_ItemResult ItemResultBroadJump = new IC_ItemResult(Constant.BROAD_JUMP, 0, 0, resultBroadJump);
-			boolean isBroadJumpResult = itemService.IC_WriteItemResult(ItemResultBroadJump);
-			log.info("写入立定跳远成绩=>" + isBroadJumpResult + "成绩：" + result1 + "，学生：" + student.toString());
-			if (isBroadJumpResult) {
-				tvShow1.setText("成绩写卡完成");
-				tvShow.setText("请刷卡");
-			} else {
-				Toast.makeText(this, "写卡出错", Toast.LENGTH_SHORT).show();
+				NetUtil.showToast(context, "写卡失败，此卡非当前记录");
 			}
 		} catch (Exception e) {
 			log.error("立定跳远写卡失败");

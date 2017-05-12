@@ -135,25 +135,28 @@ public class VitalCapacityActivity extends NFCActivity {
 	private void writeCard(Intent intent) {
 		try {
 			IItemService itemService = new NFCItemServiceImpl(intent);
-
-			IC_Result[] resultVitalCapacity = new IC_Result[4];
-			String chengji = "";
-			if (checkedBtn.equals("犯规") || checkedBtn.equals("弃权")) {
-				chengji = "0";
+			if (itemService.IC_ReadStuInfo().getStuCode().equals(tvNumber.getText().toString())) {
+				IC_Result[] resultVitalCapacity = new IC_Result[4];
+				String chengji = "";
+				if (checkedBtn.equals("犯规") || checkedBtn.equals("弃权")) {
+					chengji = "0";
+				} else {
+					chengji = etChengji.getText().toString();
+				}
+				int result1 = Integer.parseInt(chengji);
+				resultVitalCapacity[0] = new IC_Result(result1, 1, 0, 0);
+				IC_ItemResult ItemResultVitalCapacity = new IC_ItemResult(Constant.VITAL_CAPACITY, 0, 0,
+						resultVitalCapacity);
+				boolean isVitalCapacityResult = itemService.IC_WriteItemResult(ItemResultVitalCapacity);
+				log.info("写入肺活量成绩=>" + isVitalCapacityResult + "成绩：" + result1 + "，学生：" + student.toString());
+				if (isVitalCapacityResult) {
+					tvShow1.setText("成绩写卡完成");
+					tvShow.setText("请刷卡");
+				} else {
+					Toast.makeText(this, "写卡出错", Toast.LENGTH_SHORT).show();
+				}
 			} else {
-				chengji = etChengji.getText().toString();
-			}
-			int result1 = Integer.parseInt(chengji);
-			resultVitalCapacity[0] = new IC_Result(result1, 1, 0, 0);
-			IC_ItemResult ItemResultVitalCapacity = new IC_ItemResult(Constant.VITAL_CAPACITY, 0, 0,
-					resultVitalCapacity);
-			boolean isVitalCapacityResult = itemService.IC_WriteItemResult(ItemResultVitalCapacity);
-			log.info("写入肺活量成绩=>" + isVitalCapacityResult + "成绩：" + result1 + "，学生：" + student.toString());
-			if (isVitalCapacityResult) {
-				tvShow1.setText("成绩写卡完成");
-				tvShow.setText("请刷卡");
-			} else {
-				Toast.makeText(this, "写卡出错", Toast.LENGTH_SHORT).show();
+				NetUtil.showToast(context, "写卡失败，此卡非当前记录");
 			}
 		} catch (Exception e) {
 			log.error("肺活量写卡失败");
@@ -371,7 +374,8 @@ public class VitalCapacityActivity extends NFCActivity {
 					// long stuID =
 					// DbService.getInstance(context).queryStudentByCode(tvNumber.getText().toString()).get(0)
 					// .getStudentID();
-					// long itemID = DbService.getInstance(context).queryItemByCode(itemCode).getItemID();
+					// long itemID =
+					// DbService.getInstance(context).queryItemByCode(itemCode).getItemID();
 					studentItems = DbService.getInstance(context).queryStudentItemByCode(tvNumber.getText().toString(),
 							itemCode);
 

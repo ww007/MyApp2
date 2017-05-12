@@ -5,6 +5,7 @@ import org.apache.log4j.Logger;
 import com.fpl.myapp.log4j.LogUtil;
 import android.app.Application;
 import android.content.Context;
+import android.telephony.TelephonyManager;
 import ww.greendao.dao.DaoMaster;
 import ww.greendao.dao.DaoMaster.OpenHelper;
 import ww.greendao.dao.DaoSession;
