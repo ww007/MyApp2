@@ -49,15 +49,12 @@ public class SplashScreenActivity extends Activity {
 	private void isWifiConnected(boolean result) {
 		if (true == result) {
 			if (DbService.getInstance(context).getStudentItemsCount() == 0) {
-//				pbSplash.setVisibility(View.VISIBLE);
+				pbSplash.setVisibility(View.VISIBLE);
 				HttpUtil.getItemInfo(context);
-				if (HttpUtil.okFlag == 3000) {
-					SPLASH_TIME_OUT = 2000;
-				} else {
-					SPLASH_TIME_OUT = 60000;
-				}
+			}else {
+				handlePost(SPLASH_TIME_OUT);
 			}
-			handlePost(SPLASH_TIME_OUT);
+			
 		} else {
 			if (DbService.getInstance(context).loadAllItem().isEmpty()) {
 				Toast.makeText(context, "提示：当前未连接网路，相关数据下载失败", Toast.LENGTH_SHORT).show();

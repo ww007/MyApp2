@@ -11,6 +11,7 @@ import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.fpl.myapp2.R;
+import com.fpl.myapp.activity.MainActivity;
 import com.fpl.myapp.activity.SplashScreenActivity;
 import com.fpl.myapp.entity.PH_Class;
 import com.fpl.myapp.entity.PH_Grade;
@@ -126,12 +127,9 @@ public class SaveDBUtil {
 			String className = classes.get(i).getClassName();
 			long gradeID = DbService.getInstance(context).queryGradeByCode(gradeCode).getGradeID();
 			Classes newClass = new Classes(null, gradeID, classCode, className, null);
-//			while (context.getClass().equals(SplashScreenActivity.class)) {
-//				SplashScreenActivity.handleUI(((i + 1) * 100) / classes.size());
-//				if (i == classes.size() - 1) {
-//					SplashScreenActivity.handleUI(0);
-//				}
-//			}
+			// if(context.getClass().equals(SplashScreenActivity.class)) {
+			// SplashScreenActivity.handleUI(((i + 1) * 100) / classes.size());
+			// }
 			mClasses.add(newClass);
 		}
 		mAsyncSession.runInTx(new Runnable() {
@@ -165,12 +163,6 @@ public class SaveDBUtil {
 							students.get(i).getStudentName(), students.get(i).getSex(), classID, gradeID,
 							students.get(i).getIDCardNo(), students.get(i).getICCardNo(),
 							students.get(i).getDownloadTime(), null, null, null);
-//					while (context.getClass().equals(SplashScreenActivity.class)) {
-//						SplashScreenActivity.handleUI(((i + 1) * 100) / students.size());
-//						if (i == students.size() - 1) {
-//							SplashScreenActivity.handleUI(0);
-//						}
-//					}
 					mStudents.add(student);
 				}
 				mAsyncSession.runInTx(new Runnable() {
@@ -203,28 +195,22 @@ public class SaveDBUtil {
 			@Override
 			public void run() {
 				mStudentItems = new ArrayList<>();
-				int i = 0;
 				for (PH_StudentItem stuItem : studentItems) {
 					String itemCode = stuItem.getItemCode();
 					String studentCode = stuItem.getStudentCode();
 					StudentItem studentItem = new StudentItem(null, studentCode, itemCode, null, 0, null, 0, null, null,
 							null);
 					mStudentItems.add(studentItem);
-//					while (context.getClass().equals(SplashScreenActivity.class)) {
-//						SplashScreenActivity.handleUI(((i + 1) * 100) / studentItems.size());
-//						if (i == studentItems.size() - 1) {
-//							SplashScreenActivity.handleUI(0);
-//							SplashScreenActivity.pbSplash.setVisibility(View.GONE);
-//						}
-//					}
-
-					i++;
 				}
 
 				mAsyncSession.runInTx(new Runnable() {
 					@Override
 					public void run() {
-						DbService.studentItemDao.insertOrReplaceInTx(mStudentItems);
+						if (context.getClass().equals(SplashScreenActivity.class)) {
+							DbService.studentItemDao.insertOrReplaceInTx(mStudentItems);
+							Intent intent = new Intent(context, MainActivity.class);
+							context.startActivity(intent);
+						}
 						Log.i("currentPage----------", "保存学生项目信息完成");
 						Log.i("mStudentItems", mStudentItems.size() + "");
 						showNotification(context);

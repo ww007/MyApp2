@@ -1,6 +1,7 @@
 package com.fpl.myapp.activity.project;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import org.apache.log4j.Logger;
 
@@ -22,7 +23,9 @@ import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.IntentSender.SendIntentException;
 import android.os.Bundle;
+import android.os.Handler;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
@@ -49,6 +52,14 @@ public class RunGradeActivity extends NFCActivity {
 
 	private Logger log = Logger.getLogger(RunGradeActivity.class);
 	private Student student = new Student();
+	private Handler mHandler = new Handler();
+	Runnable tip = new Runnable() {
+
+		@Override
+		public void run() {
+			NetUtil.showToast(context, "成绩还未写入IC卡中，请重新刷卡");
+		}
+	};
 
 	@SuppressWarnings("unchecked")
 	@Override
@@ -96,39 +107,54 @@ public class RunGradeActivity extends NFCActivity {
 	 * 
 	 * @param intent
 	 */
+	private List<String> stuCodes = new ArrayList<>();
+
 	private void writeCard(Intent intent) {
 
 		try {
 			Log.i("title=", title);
-			final IItemService itemService = new NFCItemServiceImpl(intent);
+			final NFCItemServiceImpl itemService = new NFCItemServiceImpl(intent);
 			student = itemService.IC_ReadStuInfo();
+
 			if (student == null) {
 				NetUtil.showToast(context, "此卡无效");
 				return;
 			}
-			// else {
-			// for (final RunGrade runGrade : ChengjiAdapter.datas) {
-			// if (student.getStuCode().equals(runGrade.getStuCode())) {
-			// new
-			// AlertDialog.Builder(RunGradeActivity.this).setTitle("提示").setMessage("当前IC卡已有成绩，是否覆盖？")
-			// .setPositiveButton("否", new DialogInterface.OnClickListener() {
-			//
-			// @Override
-			// public void onClick(DialogInterface dialog, int which) {
-			// return;
-			// }
-			// }).setNegativeButton("是", new DialogInterface.OnClickListener() {
-			//
-			// @Override
-			// public void onClick(DialogInterface dialog, int which) {
-			// runGrades.get(runGrade.getXuhao() - 1).setName(null);
-			// }
-			// }).show();
-			// showView();
-			// }
-			// }
-			// }
-			readAndWrite(itemService);
+			stuCodes.clear();
+			for (RunGrade runGrade : ChengjiAdapter.datas) {
+				stuCodes.add(runGrade.getStuCode());
+			}
+			Log.i("stuCodes", stuCodes.toString());
+
+			if (stuCodes.contains(student.getStuCode())) {
+				for (int i = 0; i < ChengjiAdapter.datas.size(); i++) {
+					final int j = i;
+					if (student.getStuCode().equals(ChengjiAdapter.datas.get(i).getStuCode())) {
+						Log.i("11111111111111", i + "==============");
+						new AlertDialog.Builder(RunGradeActivity.this).setTitle("当前IC卡已有成绩，是否覆盖？")
+								.setMessage("温馨提示：此操作时请不要移开IC卡以防写卡失败！").setPositiveButton("否", null)
+								.setNegativeButton("是", new DialogInterface.OnClickListener() {
+
+									@Override
+									public void onClick(DialogInterface dialog, int which) {
+										try {
+											ChengjiAdapter.datas.get(j).setName("");
+											ChengjiAdapter.datas.get(j).setSex(0);
+											ChengjiAdapter.datas.get(j).setStuCode("");
+											readAndWrite(itemService);
+											return;
+										} catch (Exception e) {
+											log.error(title + "成绩还未写入");
+											mHandler.post(tip);
+										}
+									}
+								}).show();
+					}
+				}
+			} else {
+				readAndWrite(itemService);
+				Log.i("22222222222222", "==============");
+			}
 		} catch (Exception e) {
 			log.error(title + "写卡操作失败");
 		}
@@ -179,6 +205,27 @@ public class RunGradeActivity extends NFCActivity {
 		currentPosition++;
 		adapter.setSelectItem(currentPosition);
 		adapter.notifyDataSetInvalidated();
+	}
+
+	/**
+	 * 更新当前listView显示部分信息
+	 * 
+	 * @param itemIndex
+	 * @param student
+	 */
+	private void updateView(int itemIndex, Student student) {
+		runGrades.get(itemIndex).setName(currentName);
+		currentName = "";
+		// 得到第一个可显示控件的位置
+		int visiblePosition = lvGrade.getFirstVisiblePosition();
+		// 只有当要更新的view在可见的位置时才更新，不可见时，跳过不更新
+		if (itemIndex - visiblePosition >= 0) {
+			// 得到要更新的item的view
+			View view = lvGrade.getChildAt(itemIndex - visiblePosition);
+			// 调用adapter更新界面
+			adapter.updateView(view, itemIndex, student);
+		}
+
 	}
 
 	private ArrayList<RunGrade> datas;
@@ -316,27 +363,6 @@ public class RunGradeActivity extends NFCActivity {
 			break;
 		}
 		return super.onKeyDown(keyCode, event);
-	}
-
-	/**
-	 * 更新当前listView显示部分信息
-	 * 
-	 * @param itemIndex
-	 * @param student
-	 */
-	private void updateView(int itemIndex, Student student) {
-		runGrades.get(itemIndex).setName(currentName);
-		currentName = "";
-		// 得到第一个可显示控件的位置
-		int visiblePosition = lvGrade.getFirstVisiblePosition();
-		// 只有当要更新的view在可见的位置时才更新，不可见时，跳过不更新
-		if (itemIndex - visiblePosition >= 0) {
-			// 得到要更新的item的view
-			View view = lvGrade.getChildAt(itemIndex - visiblePosition);
-			// 调用adapter更新界面
-			adapter.updateView(view, itemIndex, student);
-		}
-
 	}
 
 	private void initView() {

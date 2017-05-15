@@ -14,14 +14,20 @@ import org.apaches.commons.codec.digest.DigestUtils;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
+import com.fpl.myapp.activity.MainActivity;
+import com.fpl.myapp.activity.SplashScreenActivity;
 import com.fpl.myapp.db.DbService;
 import com.fpl.myapp.db.SaveDBUtil;
 import com.fpl.myapp.entity.First_Student;
 import com.fpl.myapp.entity.First_StudentItem;
 import com.fpl.myapp.entity.PH_Student;
 import com.fpl.myapp.entity.PH_StudentItem;
+import com.fpl.myapp2.R;
+
 import android.content.Context;
+import android.content.Intent;
 import android.util.Log;
+import android.view.View;
 import android.widget.Toast;
 import okhttp3.Call;
 import okhttp3.Callback;
@@ -252,6 +258,9 @@ public class HttpUtil {
 								totalStudents.addAll(currentResult);
 							}
 							currentStuPage++;
+							if (context.getClass().equals(SplashScreenActivity.class)) {
+								SplashScreenActivity.handleUI((currentStuPage * 100) / currentStudent.getTotalPage());
+							}
 							if (currentStudent.getPageNo() == currentStudent.getTotalPage()) {
 								HttpUtil.getStudentItemInfo(context);
 								SaveDBUtil.saveStudentPage(context, totalStudents);
@@ -353,6 +362,9 @@ public class HttpUtil {
 							}
 							Log.i("studentItem当前页", currentStuItem.getPageNo() + "");
 							currentPage++;
+							if (context.getClass().equals(SplashScreenActivity.class)) {
+								SplashScreenActivity.handleUI((currentPage * 100) / currentStuItem.getTotalPage());
+							}
 							if (currentStuItem.getPageNo() == currentStuItem.getTotalPage()) {
 								Log.i("studentItems", studentItems.size() + "");
 								SaveDBUtil.saveStudentItemDB(studentItems, context, currentStuItem.getTotalPage(),
